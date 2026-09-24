@@ -21,12 +21,11 @@ interface SoundStore {
   override: (sounds: Record<string, number>) => void;
   pause: () => void;
   play: () => void;
+  commitMix: (ids: Array<string>, gains: Record<string, number>) => void;
   prepareMix: (ids: Array<string>) => void;
-  releaseSilent: (ids: Array<string>) => void;
   restoreHistory: () => void;
   select: (id: string) => void;
   setVolume: (id: string, volume: number) => void;
-  setVolumes: (volumes: Record<string, number>) => void;
   shuffle: () => void;
   sounds: Record<string, SoundValue>;
   toggleFavorite: (id: string) => void;
@@ -103,9 +102,32 @@ export const useSoundStore = create<SoundStore>()(
       },
 
       /**
+       * Hand a code-driven mix (see stores/mix.ts) back to the listener, in
+       * one update: each of `ids` still audible keeps playing at its gain as
+       * its own volume; silent ones are deselected at the default volume.
+       */
+      commitMix(ids, gains) {
+        const sounds = { ...get().sounds };
+
+        ids.forEach(id => {
+          if (!sounds[id]) return;
+
+          const gain = gains[id] ?? 0;
+
+          sounds[id] =
+            gain > 0
+              ? { ...sounds[id], volume: gain }
+              : { ...sounds[id], isSelected: false, volume: 0.5 };
+        });
+
+        set({ sounds });
+      },
+
+      /**
        * Select exactly `ids` at volume 0 and deselect everything else, in one
        * update. Used by the transition engine before a run so every sound on
        * the trajectory starts loading and sits silent until its first tick.
+       * Per-tick gains then go to the mix store, not here.
        */
       prepareMix(ids) {
         const sounds = get().sounds;
@@ -122,22 +144,6 @@ export const useSoundStore = create<SoundStore>()(
         });
 
         set({ history: null, sounds: next });
-      },
-
-      /**
-       * Deselect any of `ids` left at volume 0, restoring the default volume,
-       * so a finished transition doesn't leave silent sounds selected.
-       */
-      releaseSilent(ids) {
-        const sounds = { ...get().sounds };
-
-        ids.forEach(id => {
-          if (sounds[id] && sounds[id].volume === 0) {
-            sounds[id] = { ...sounds[id], isSelected: false, volume: 0.5 };
-          }
-        });
-
-        set({ sounds });
       },
 
       restoreHistory() {
@@ -165,20 +171,6 @@ export const useSoundStore = create<SoundStore>()(
             [id]: { ...get().sounds[id], volume },
           },
         });
-      },
-
-      /**
-       * Set many volumes in one update. The transition engine writes the whole
-       * mix every tick; one `set` per tick instead of one per sound.
-       */
-      setVolumes(volumes) {
-        const sounds = { ...get().sounds };
-
-        Object.keys(volumes).forEach(id => {
-          if (sounds[id]) sounds[id] = { ...sounds[id], volume: volumes[id] };
-        });
-
-        set({ sounds });
       },
 
       shuffle() {

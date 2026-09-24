@@ -1,3 +1,4 @@
+import { useMixStore } from '@/stores/mix';
 import { useSoundStore } from '@/stores/sound';
 
 import styles from './range.module.css';
@@ -9,7 +10,9 @@ interface RangeProps {
 
 export function Range({ id, label }: RangeProps) {
   const setVolume = useSoundStore(state => state.setVolume);
-  const volume = useSoundStore(state => state.sounds[id].volume);
+  const ownVolume = useSoundStore(state => state.sounds[id].volume);
+  const drivenGain = useMixStore(state => state.gains[id]);
+  const volume = drivenGain ?? ownVolume;
   const isSelected = useSoundStore(state => state.sounds[id].isSelected);
   const locked = useSoundStore(state => state.locked);
 

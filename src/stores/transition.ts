@@ -8,6 +8,7 @@ import {
   type TickState,
 } from '@/lib/transition';
 import { getSoundSrc } from '@/lib/sounds';
+import { useMixStore } from './mix';
 import { useSoundStore } from './sound';
 import { useLoadingStore } from './loading';
 
@@ -51,6 +52,12 @@ interface TransitionStore {
 let handle: EngineHandle | null = null;
 let unsubscribeSound: (() => void) | null = null;
 let token = 0;
+
+/** Leave whatever is audible playing as the listener's own mix. */
+function release(ids: Array<string>) {
+  useSoundStore.getState().commitMix(ids, useMixStore.getState().gains);
+  useMixStore.getState().clear();
+}
 
 function detach() {
   handle?.cancel();
@@ -122,7 +129,7 @@ export const useTransitionStore = create<TransitionStore>()((set, get) => ({
       ids,
       onComplete() {
         detach();
-        useSoundStore.getState().releaseSilent(ids);
+        release(ids);
         set({ status: 'complete' });
         hooks.onComplete?.();
       },
@@ -130,7 +137,7 @@ export const useTransitionStore = create<TransitionStore>()((set, get) => ({
         set({ mix: state.mix, position: state.position, t: state.t });
         hooks.onTick?.(state);
       },
-      setVolumes: volumes => useSoundStore.getState().setVolumes(volumes),
+      setVolumes: gains => useMixStore.getState().setGains(gains),
     });
 
     // a zero-length run completes inside runTransition()
@@ -158,9 +165,7 @@ export const useTransitionStore = create<TransitionStore>()((set, get) => ({
 
     const { ids, status } = get();
 
-    if (status === 'loading' || status === 'running') {
-      useSoundStore.getState().releaseSilent(ids);
-    }
+    if (status === 'loading' || status === 'running') release(ids);
 
     set({ mix: {}, position: null, status: 'idle', t: 0 });
   },

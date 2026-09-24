@@ -5,6 +5,7 @@ import { Range } from './range';
 import { Favorite } from './favorite';
 
 import { useSound } from '@/hooks/use-sound';
+import { useMixStore } from '@/stores/mix';
 import { useSoundStore } from '@/stores/sound';
 import { useSettingsStore } from '@/stores/settings';
 import { useLoadingStore } from '@/stores/loading';
@@ -35,7 +36,10 @@ export const Sound = forwardRef<HTMLDivElement, SoundProps>(function Sound(
   const isSelected = useSoundStore(state => state.sounds[id].isSelected);
   const locked = useSoundStore(state => state.locked);
 
-  const volume = useSoundStore(state => state.sounds[id].volume);
+  // a code-driven gain (transition engine, visualiser) wins over the listener's
+  const ownVolume = useSoundStore(state => state.sounds[id].volume);
+  const drivenGain = useMixStore(state => state.gains[id]);
+  const volume = drivenGain ?? ownVolume;
   const globalVolume = useSettingsStore(state => state.globalVolume);
   const adjustedVolume = useMemo(
     () => volume * globalVolume,

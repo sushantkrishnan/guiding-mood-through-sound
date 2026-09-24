@@ -51,6 +51,7 @@ import {
 } from '@/lib/libraries';
 import * as libraryPlayer from '@/lib/library-player';
 import { cn } from '@/helpers/styles';
+import { useMixStore } from '@/stores/mix';
 import { useSettingsStore } from '@/stores/settings';
 import { useSoundStore } from '@/stores/sound';
 import { useStudyStore } from '@/stores/study';
@@ -315,6 +316,7 @@ function Workbench() {
       ownsMix.current = true;
     } else if (ownsMix.current) {
       ownsMix.current = false;
+      useMixStore.getState().clear();
       useSoundStore.getState().unselectAll();
       libraryPlayer.stop();
     }
@@ -322,7 +324,10 @@ function Workbench() {
 
   useEffect(
     () => () => {
-      if (ownsMix.current) useSoundStore.getState().unselectAll();
+      if (ownsMix.current) {
+        useMixStore.getState().clear();
+        useSoundStore.getState().unselectAll();
+      }
       libraryPlayer.stop();
     },
     [],
@@ -344,7 +349,7 @@ function Workbench() {
       (isMoodist(id) ? own : added)[id] = sample?.mix[id] ?? 0;
     });
 
-    useSoundStore.getState().setVolumes(own);
+    useMixStore.getState().setGains(own);
     libraryPlayer.setVolumes(added, useSettingsStore.getState().globalVolume);
   }, [soundOn, playing, sample, laneIds]);
 
