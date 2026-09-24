@@ -13,6 +13,7 @@ import { SharedModal } from '@/components/modals/shared';
 import { Toolbar } from '@/components/toolbar';
 import { SnackbarProvider } from '@/contexts/snackbar';
 import { MediaControls } from '@/components/media-controls';
+import { Study } from '@/components/study';
 
 import { sounds } from '@/data/sounds';
 import { FADE_OUT } from '@/constants/events';
@@ -98,6 +99,7 @@ export function App() {
 
         <Toolbar />
         <SharedModal />
+        <Study />
       </StoreConsumer>
     </SnackbarProvider>
   );
