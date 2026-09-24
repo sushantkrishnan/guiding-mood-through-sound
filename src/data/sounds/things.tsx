@@ -11,6 +11,7 @@ import { RiFilePaper2Fill, RiBubbleChartFill } from 'react-icons/ri/index';
 import { BiSolidDryer } from 'react-icons/bi/index';
 import { IoIosRadio } from 'react-icons/io/index';
 import { PiVinylRecord } from 'react-icons/pi/index';
+import { TbBulb } from 'react-icons/tb/index';
 
 import type { Category } from '../types';
 
@@ -109,6 +110,12 @@ export const things: Category = {
       id: 'vinyl-effect',
       label: 'Vinyl Effect',
       src: getAssetPath('/sounds/things/vinyl-effect.mp3'),
+    },
+    {
+      icon: <TbBulb />,
+      id: 'fluorescent-hum',
+      label: 'Fluorescent Hum',
+      src: getAssetPath('/sounds/things/fluorescent-hum.wav'),
     },
     {
       icon: <TbWiper />,
