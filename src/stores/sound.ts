@@ -21,9 +21,12 @@ interface SoundStore {
   override: (sounds: Record<string, number>) => void;
   pause: () => void;
   play: () => void;
+  prepareMix: (ids: Array<string>) => void;
+  releaseSilent: (ids: Array<string>) => void;
   restoreHistory: () => void;
   select: (id: string) => void;
   setVolume: (id: string, volume: number) => void;
+  setVolumes: (volumes: Record<string, number>) => void;
   shuffle: () => void;
   sounds: Record<string, SoundValue>;
   toggleFavorite: (id: string) => void;
@@ -99,6 +102,44 @@ export const useSoundStore = create<SoundStore>()(
         set({ isPlaying: true });
       },
 
+      /**
+       * Select exactly `ids` at volume 0 and deselect everything else, in one
+       * update. Used by the transition engine before a run so every sound on
+       * the trajectory starts loading and sits silent until its first tick.
+       */
+      prepareMix(ids) {
+        const sounds = get().sounds;
+        const next: Record<string, SoundValue> = {};
+
+        Object.keys(sounds).forEach(id => {
+          const inMix = ids.includes(id);
+
+          next[id] = {
+            ...sounds[id],
+            isSelected: inMix,
+            volume: inMix ? 0 : 0.5,
+          };
+        });
+
+        set({ history: null, sounds: next });
+      },
+
+      /**
+       * Deselect any of `ids` left at volume 0, restoring the default volume,
+       * so a finished transition doesn't leave silent sounds selected.
+       */
+      releaseSilent(ids) {
+        const sounds = { ...get().sounds };
+
+        ids.forEach(id => {
+          if (sounds[id] && sounds[id].volume === 0) {
+            sounds[id] = { ...sounds[id], isSelected: false, volume: 0.5 };
+          }
+        });
+
+        set({ sounds });
+      },
+
       restoreHistory() {
         const history = get().history;
 
@@ -124,6 +165,20 @@ export const useSoundStore = create<SoundStore>()(
             [id]: { ...get().sounds[id], volume },
           },
         });
+      },
+
+      /**
+       * Set many volumes in one update. The transition engine writes the whole
+       * mix every tick; one `set` per tick instead of one per sound.
+       */
+      setVolumes(volumes) {
+        const sounds = { ...get().sounds };
+
+        Object.keys(volumes).forEach(id => {
+          if (sounds[id]) sounds[id] = { ...sounds[id], volume: volumes[id] };
+        });
+
+        set({ sounds });
       },
 
       shuffle() {
