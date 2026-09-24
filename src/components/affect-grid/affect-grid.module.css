@@ -41,6 +41,30 @@
   position: relative;
   flex-grow: 1;
   aspect-ratio: 1;
+
+  /* the neutral axes, dashed as in Russell et al.'s original grid. A shaded
+     band reads as a zone of its own and can pull answers towards it */
+  &::before,
+  &::after {
+    position: absolute;
+    z-index: 1;
+    pointer-events: none;
+    content: '';
+  }
+
+  &::before {
+    top: 0;
+    bottom: 0;
+    left: 50%;
+    border-left: 1px dashed var(--color-neutral-400);
+  }
+
+  &::after {
+    top: 50%;
+    right: 0;
+    left: 0;
+    border-top: 1px dashed var(--color-neutral-400);
+  }
 }
 
 .grid {
@@ -73,14 +97,6 @@
     border-bottom: none;
   }
 
-  &.midColumn {
-    background-color: var(--color-neutral-100);
-  }
-
-  &.midRow {
-    background-color: var(--color-neutral-100);
-  }
-
   &:hover {
     background-color: var(--color-neutral-200);
   }
@@ -89,6 +105,14 @@
     z-index: 1;
     outline: 2px solid var(--color-neutral-600);
     outline-offset: -2px;
+  }
+
+  &.reference::before {
+    position: absolute;
+    inset: 26%;
+    content: '';
+    border: 2px solid var(--color-neutral-500);
+    border-radius: 50%;
   }
 
   &.checked::after {
@@ -105,11 +129,6 @@
 
   &:hover {
     background-color: var(--color-neutral-50);
-  }
-
-  &.midColumn:hover,
-  &.midRow:hover {
-    background-color: var(--color-neutral-100);
   }
 }
 

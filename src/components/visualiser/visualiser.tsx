@@ -28,12 +28,8 @@ import {
   sampleAt,
   upNext,
 } from '@/lib/route';
-import {
-  CONDITIONS,
-  LOG_SCHEMA,
-  savedLogs,
-  type SessionLog,
-} from '@/lib/study';
+import { savedLogs } from '@/lib/log-store';
+import { conditionLabel, LOG_SCHEMAS, type SessionLog } from '@/lib/study';
 import {
   ENGINE_DEFAULTS,
   type EngineSettings as Engine,
@@ -70,9 +66,6 @@ const SPEEDS = [1, 10, 30, 60];
 
 /** points drawn for the route line on the map */
 const TRAIL_POINTS = 300;
-
-const conditionLabel = (id: string) =>
-  CONDITIONS.find(c => c.id === id)?.label ?? id;
 
 const percent = (gain: number) => `${Math.round(gain * 100)}%`;
 
@@ -159,7 +152,7 @@ function Workbench() {
   // the regular app is underneath (it plays the audio); keep it out of the way
   useEffect(() => {
     setActive(true);
-    setSaved(savedLogs());
+    savedLogs().then(setSaved);
 
     const previous = document.body.style.overflowY;
     document.body.style.overflowY = 'hidden';
@@ -193,17 +186,31 @@ function Workbench() {
     if (log) {
       const last = log.trace.at(-1)?.t ?? 0;
       const duration = Math.max(log.config.durationMs, last, 1);
-      const schedule = buildSchedule(logSamples(log), duration, {
-        detectAbrupt: log.condition !== 'unguided',
-        rampIn: log.config.engine.rampIn,
-      });
+      const { route } = log;
       const toPoint = (a: { arousal: number; valence: number } | null) =>
         a ? { arousal: a.arousal, valence: a.valence } : null;
 
+      // a guided session replays exactly from its route (the trace is thinned
+      // to 2Hz), cut where the participant stopped listening
+      const guided = route && log.condition !== 'unguided';
+      const samples = guided
+        ? planSamples({
+            ...log.config.engine,
+            duration: log.config.durationMs,
+            shape: route.shape as PathShape,
+            start: route.start,
+            target: route.target,
+          }).filter(sample => sample.t <= log.summary.listenedMs)
+        : logSamples(log);
+      const schedule = buildSchedule(samples, duration, {
+        detectAbrupt: log.condition !== 'unguided',
+        rampIn: log.config.engine.rampIn,
+      });
+
       return {
         schedule,
-        start: toPoint(log.measures.pre),
-        target: toPoint(log.measures.target),
+        start: toPoint(route?.start ?? log.measures.pre),
+        target: toPoint(route?.target ?? log.measures.target),
       };
     }
 
@@ -418,7 +425,10 @@ function Workbench() {
     try {
       const parsed = JSON.parse(await file.text());
 
-      if (parsed?.schema !== LOG_SCHEMA || !Array.isArray(parsed.trace)) {
+      if (
+        !LOG_SCHEMAS.includes(parsed?.schema) ||
+        !Array.isArray(parsed.trace)
+      ) {
         throw new Error('not a study log');
       }
 

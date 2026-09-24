@@ -21,6 +21,30 @@ export interface AffectPoint {
 export type AffectMap = Record<string, AffectPoint>;
 
 /**
+ * One cell of Russell, Weiss & Mendelsohn's (1989) Affect Grid, scored 1..9
+ * on each axis as in the original instrument.
+ */
+export interface GridCell {
+  arousal: number;
+  pleasure: number;
+}
+
+const GRID_MID = 5;
+
+/** Grid scores (1..9) → engine coordinates (-1..+1). */
+export function cellToPoint(cell: GridCell): AffectPoint {
+  return {
+    arousal: (cell.arousal - GRID_MID) / (GRID_MID - 1),
+    valence: (cell.pleasure - GRID_MID) / (GRID_MID - 1),
+  };
+}
+
+/** Distance between two grid answers, in cells. */
+export function cellDistance(a: GridCell, b: GridCell) {
+  return Math.hypot(a.arousal - b.arousal, a.pleasure - b.pleasure);
+}
+
+/**
  * Coordinates grouped by Moodist category. The category is used by the
  * engine to keep a mix to one scene (see `coherence` in transition.ts).
  */

@@ -12,11 +12,15 @@ import CategoryIcons from '@/components/categories/category-icons/category-icons
 ---
 
 <Layout title="Moodist: Ambient Sounds for Focus and Calm">
-  <Donate />
-  <Hero />
-  <CategoryIcons client:load />
+  <div class="study-hide">
+    <Donate />
+    <Hero />
+    <CategoryIcons client:load />
+  </div>
   <App client:load />
-  <About />
-  <Source />
-  <Footer />
+  <div class="study-hide">
+    <About />
+    <Source />
+    <Footer />
+  </div>
 </Layout>

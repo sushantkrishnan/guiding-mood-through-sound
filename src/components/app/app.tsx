@@ -4,6 +4,7 @@ import { BiSolidHeart } from 'react-icons/bi/index';
 import { Howler } from 'howler';
 
 import { useSoundStore } from '@/stores/sound';
+import { useStudyStore } from '@/stores/study';
 
 import { Container } from '@/components/container';
 import { StoreConsumer } from '@/components/store-consumer';
@@ -28,6 +29,7 @@ export function App() {
   const favorites = useSoundStore(useShallow(state => state.getFavorites()));
   const pause = useSoundStore(state => state.pause);
   const lock = useSoundStore(state => state.lock);
+  const studyActive = useStudyStore(state => state.active);
   const unlock = useSoundStore(state => state.unlock);
 
   const favoriteSounds = useMemo(() => {
@@ -76,7 +78,9 @@ export function App() {
   const allCategories = useMemo(() => {
     const favorites = [];
 
-    if (favoriteSounds.length) {
+    // a lab machine's favourites are the researcher's, or an earlier
+    // participant's; keep them out of study sessions
+    if (favoriteSounds.length && !studyActive) {
       favorites.push({
         icon: <BiSolidHeart />,
         id: 'favorites',
@@ -86,7 +90,7 @@ export function App() {
     }
 
     return [...favorites, ...categories];
-  }, [favoriteSounds, categories]);
+  }, [favoriteSounds, categories, studyActive]);
 
   return (
     <SnackbarProvider>

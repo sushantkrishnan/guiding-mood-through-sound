@@ -1,3 +1,8 @@
 @import 'variables/index.css';
 @import 'base/base.css';
 @import 'fonts.css';
+
+/* sections that stay out of sight during study sessions (stores/study.ts) */
+html[data-study] .study-hide {
+  display: none;
+}

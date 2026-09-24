@@ -4,27 +4,12 @@ import { cn } from '@/helpers/styles';
 
 import styles from './affect-grid.module.css';
 
-import type { AffectPoint } from '@/lib/affect';
+import type { GridCell } from '@/lib/affect';
 
-/**
- * One cell of Russell, Weiss & Mendelsohn's (1989) Affect Grid, scored 1..9
- * on each axis as in the original instrument.
- */
-export interface GridCell {
-  arousal: number;
-  pleasure: number;
-}
+export { cellToPoint, type GridCell } from '@/lib/affect';
 
 const SIZE = 9;
 const MID = 5;
-
-/** Grid scores (1..9) → engine coordinates (-1..+1). */
-export function cellToPoint(cell: GridCell): AffectPoint {
-  return {
-    arousal: (cell.arousal - MID) / (MID - 1),
-    valence: (cell.pleasure - MID) / (MID - 1),
-  };
-}
 
 /** Engine valence (-1..+1) → x in grid units, where the grid is 0..9 wide. */
 export function gridX(valence: number) {
@@ -42,6 +27,14 @@ interface AffectGridProps {
   onChange?: (cell: GridCell) => void;
   /** SVG drawn over the cells in grid units (viewBox 0 0 9 9) */
   overlay?: React.ReactNode;
+  /**
+   * An earlier answer shown as a faint ring, e.g. "now" while choosing a
+   * target. Never pass it for repeated measures (check-ins, post): seeing the
+   * last answer anchors the next one.
+   */
+  reference?: GridCell | null;
+  /** accessible note for the reference ring, e.g. "how you feel now" */
+  referenceLabel?: string;
   /** draw the selected cell's dot; off when the overlay marks it instead */
   showValue?: boolean;
   value: GridCell | null;
@@ -54,6 +47,8 @@ export function AffectGrid({
   label,
   onChange,
   overlay,
+  reference = null,
+  referenceLabel = 'earlier answer',
   showValue = true,
   value,
 }: AffectGridProps) {
@@ -115,6 +110,9 @@ export function AffectGrid({
               columns.map(pleasure => {
                 const checked =
                   value?.arousal === arousal && value?.pleasure === pleasure;
+                const isReference =
+                  reference?.arousal === arousal &&
+                  reference?.pleasure === pleasure;
                 const isFocusTarget =
                   focusTarget.arousal === arousal &&
                   focusTarget.pleasure === pleasure;
@@ -122,12 +120,11 @@ export function AffectGrid({
                 return (
                   <button
                     aria-checked={checked}
-                    aria-label={`Pleasantness ${pleasure} of 9, arousal ${arousal} of 9`}
+                    aria-label={`Pleasantness ${pleasure} of 9, arousal ${arousal} of 9${isReference ? `, ${referenceLabel}` : ''}`}
                     className={cn(
                       styles.cell,
                       checked && showValue && styles.checked,
-                      pleasure === MID && styles.midColumn,
-                      arousal === MID && styles.midRow,
+                      isReference && styles.reference,
                     )}
                     disabled={readOnly}
                     key={`${pleasure}-${arousal}`}

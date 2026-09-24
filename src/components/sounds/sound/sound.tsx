@@ -7,6 +7,7 @@ import { Favorite } from './favorite';
 import { useSound } from '@/hooks/use-sound';
 import { useMixStore } from '@/stores/mix';
 import { useSoundStore } from '@/stores/sound';
+import { useStudyStore } from '@/stores/study';
 import { useSettingsStore } from '@/stores/settings';
 import { useLoadingStore } from '@/stores/loading';
 import { cn } from '@/helpers/styles';
@@ -35,6 +36,7 @@ export const Sound = forwardRef<HTMLDivElement, SoundProps>(function Sound(
   const setVolume = useSoundStore(state => state.setVolume);
   const isSelected = useSoundStore(state => state.sounds[id].isSelected);
   const locked = useSoundStore(state => state.locked);
+  const studyActive = useStudyStore(state => state.active);
 
   // a code-driven gain (transition engine, visualiser) wins over the listener's
   const ownVolume = useSoundStore(state => state.sounds[id].volume);
@@ -105,7 +107,7 @@ export const Sound = forwardRef<HTMLDivElement, SoundProps>(function Sound(
       onClick={handleClick}
       onKeyDown={handleKeyDown}
     >
-      <Favorite id={id} label={label} />
+      {!studyActive && <Favorite id={id} label={label} />}
       <div className={styles.icon}>
         {isLoading ? (
           <span aria-hidden="true" className={styles.spinner}>

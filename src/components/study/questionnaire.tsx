@@ -4,20 +4,30 @@ import type { Questionnaire as Answers } from '@/lib/study';
 
 import styles from './study.module.css';
 
-type Scale = 'coherence' | 'direction' | 'effectiveness' | 'pleasantness';
+type Scale =
+  | 'coherence'
+  | 'direction'
+  | 'effectiveness'
+  | 'monotony'
+  | 'pleasantness';
 
 /**
- * Identical wording in every condition, so framing is held constant. Order
- * puts the primary experiential measures first (proposal-sections §4.4).
+ * Identical wording in every condition, so framing is held constant.
+ *
+ * `direction` comes last and is analysed as a manipulation check, not an
+ * outcome: a direct session is bound to score lower on it, and asked first
+ * it would prime the rest. `monotony` (one of the ISO 12913 attributes)
+ * checks whether a preference for guided is just a preference for change.
  */
 const items: Array<{ id: Scale; text: string }> = [
-  { id: 'direction', text: 'The soundscape felt like it was going somewhere.' },
-  { id: 'coherence', text: 'The sounds fitted together as one scene.' },
   { id: 'pleasantness', text: 'The soundscape was pleasant to listen to.' },
+  { id: 'coherence', text: 'The sounds fitted together as one scene.' },
+  { id: 'monotony', text: 'The soundscape was monotonous.' },
   {
     id: 'effectiveness',
     text: 'The session helped me move towards how I wanted to feel.',
   },
+  { id: 'direction', text: 'The soundscape felt like it was going somewhere.' },
 ];
 
 interface QuestionnaireProps {
@@ -32,6 +42,7 @@ export function Questionnaire({ onSubmit, sessions }: QuestionnaireProps) {
     comments: '',
     direction: null,
     effectiveness: null,
+    monotony: null,
     pleasantness: null,
     preferenceReason: '',
     preferredSession: null,

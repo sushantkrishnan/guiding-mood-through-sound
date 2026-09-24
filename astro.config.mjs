@@ -1,3 +1,5 @@
+import { execSync } from 'node:child_process';
+
 import { defineConfig } from 'astro/config';
 
 import react from '@astrojs/react';
@@ -8,10 +10,31 @@ import AstroPWA from '@vite-pwa/astro';
 const path = (process.env.BASE_PATH ?? '').replace(/^\/+|\/+$/g, '');
 const base = path ? `/${path}/` : '/';
 
+// Written into every study log (src/lib/provenance.ts), so a log says which
+// code produced it.
+const git = args => {
+  try {
+    return execSync(`git ${args}`, { stdio: ['ignore', 'pipe', 'ignore'] })
+      .toString()
+      .trim();
+  } catch {
+    return null;
+  }
+};
+const status = git('status --porcelain');
+const build = {
+  builtAt: new Date().toISOString(),
+  commit: git('rev-parse --short HEAD'),
+  dirty: status === null ? null : status.length > 0,
+};
+
 export default defineConfig({
   base,
   // scripts/pages/publish.sh builds elsewhere so dist/ keeps serving locally
   outDir: process.env.OUT_DIR || './dist',
+  vite: {
+    define: { __BUILD__: JSON.stringify(build) },
+  },
   integrations: [
     react(),
     AstroPWA({
