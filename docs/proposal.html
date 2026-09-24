@@ -1,0 +1,652 @@
+<title>Path or Destination</title>
+<style>
+  :root {
+    --ground: #F1F4F5;
+    --surface: #FFFFFF;
+    --surface-2: #E9EEF0;
+    --ink: #16202A;
+    --ink-2: #3D4E5C;
+    --muted: #5F7280;
+    --faint: #8B9BA6;
+    --rule: #D5DFE3;
+    --accent: #0E6E78;
+    --accent-soft: #D3E7E9;
+    --warm: #B0552A;
+    --warm-soft: #F0DDD0;
+    --serif: 'Iowan Old Style', 'Palatino Linotype', Palatino, 'Book Antiqua', Georgia, serif;
+    --sans: ui-sans-serif, -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+    --mono: ui-monospace, 'SF Mono', SFMono-Regular, Menlo, Consolas, monospace;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --ground: #0E1418;
+      --surface: #151D23;
+      --surface-2: #1C262D;
+      --ink: #E6EDF1;
+      --ink-2: #C0CDD5;
+      --muted: #93A4AF;
+      --faint: #6D7E89;
+      --rule: #26333B;
+      --accent: #45B2BC;
+      --accent-soft: #17383C;
+      --warm: #DD9058;
+      --warm-soft: #3A2619;
+    }
+  }
+
+  :root[data-theme="dark"] {
+    --ground: #0E1418;
+    --surface: #151D23;
+    --surface-2: #1C262D;
+    --ink: #E6EDF1;
+    --ink-2: #C0CDD5;
+    --muted: #93A4AF;
+    --faint: #6D7E89;
+    --rule: #26333B;
+    --accent: #45B2BC;
+    --accent-soft: #17383C;
+    --warm: #DD9058;
+    --warm-soft: #3A2619;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    background: var(--ground);
+    color: var(--ink);
+    font-family: var(--serif);
+    font-size: 17px;
+    line-height: 1.62;
+    margin: 0;
+    padding: 0 24px 96px;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .wrap { margin: 0 auto; max-width: 1080px; }
+  .col { margin: 0 auto; max-width: 660px; }
+
+  /* ---------- masthead ---------- */
+  header.mast {
+    border-bottom: 1px solid var(--rule);
+    margin: 0 auto 56px;
+    max-width: 1080px;
+    padding: 72px 0 34px;
+  }
+  .eyebrow {
+    color: var(--accent);
+    font-family: var(--sans);
+    font-size: 11.5px;
+    font-weight: 620;
+    letter-spacing: 0.13em;
+    margin: 0 0 20px;
+    text-transform: uppercase;
+  }
+  h1 {
+    font-size: clamp(38px, 6vw, 62px);
+    font-weight: 600;
+    letter-spacing: -0.022em;
+    line-height: 1.04;
+    margin: 0;
+    max-width: 15ch;
+    text-wrap: balance;
+  }
+  .thesis {
+    color: var(--ink-2);
+    font-size: clamp(18px, 2.2vw, 21px);
+    line-height: 1.5;
+    margin: 22px 0 0;
+    max-width: 56ch;
+    text-wrap: pretty;
+  }
+  .meta {
+    color: var(--faint);
+    display: flex;
+    flex-wrap: wrap;
+    font-family: var(--sans);
+    font-size: 12.5px;
+    gap: 8px 22px;
+    letter-spacing: 0.02em;
+    margin-top: 32px;
+  }
+  .meta b { color: var(--muted); font-weight: 560; }
+
+  /* ---------- sections ---------- */
+  section { margin: 0 auto 60px; max-width: 1080px; }
+  .sec-head {
+    align-items: baseline;
+    display: flex;
+    gap: 16px;
+    margin: 0 auto 20px;
+    max-width: 660px;
+  }
+  .sec-num {
+    color: var(--accent);
+    font-family: var(--sans);
+    font-size: 12px;
+    font-variant-numeric: tabular-nums;
+    font-weight: 660;
+    letter-spacing: 0.06em;
+    padding-top: 7px;
+  }
+  h2 {
+    font-size: 27px;
+    font-weight: 600;
+    letter-spacing: -0.014em;
+    line-height: 1.2;
+    margin: 0;
+    text-wrap: balance;
+  }
+  h3 {
+    color: var(--ink);
+    font-family: var(--sans);
+    font-size: 13px;
+    font-weight: 640;
+    letter-spacing: 0.05em;
+    margin: 34px 0 12px;
+    text-transform: uppercase;
+  }
+  p { margin: 0 0 17px; text-wrap: pretty; }
+  .col > p:last-child { margin-bottom: 0; }
+  a { color: var(--accent); text-decoration-thickness: 1px; text-underline-offset: 2px; }
+  strong { font-weight: 640; }
+  em.term { font-style: italic; }
+
+  ul, ol { margin: 0 0 17px; padding-left: 22px; }
+  li { margin-bottom: 8px; padding-left: 3px; }
+  li::marker { color: var(--faint); }
+
+  /* ---------- RQ block ---------- */
+  .rq {
+    background: var(--surface);
+    border: 1px solid var(--rule);
+    border-left: 3px solid var(--accent);
+    margin: 0 auto;
+    max-width: 660px;
+    padding: 30px 34px;
+  }
+  .rq .lbl {
+    color: var(--accent);
+    font-family: var(--sans);
+    font-size: 11px;
+    font-weight: 660;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+  .rq .primary {
+    font-size: 22px;
+    line-height: 1.36;
+    margin: 12px 0 0;
+    text-wrap: pretty;
+  }
+  .rq .sub { border-top: 1px solid var(--rule); margin-top: 22px; padding-top: 18px; }
+  .rq .sub p { color: var(--ink-2); font-size: 16px; margin-bottom: 10px; }
+  .rq .sub p:last-child { margin-bottom: 0; }
+  .rq .sub .tag {
+    color: var(--faint);
+    font-family: var(--sans);
+    font-size: 11px;
+    font-weight: 640;
+    letter-spacing: 0.06em;
+    margin-right: 8px;
+  }
+
+  /* ---------- exhibit ---------- */
+  figure {
+    background: var(--surface);
+    border: 1px solid var(--rule);
+    margin: 0 auto;
+    max-width: 1080px;
+    padding: 32px 32px 24px;
+  }
+  .fig-inner { display: flex; flex-wrap: wrap; gap: 36px; justify-content: center; }
+  .fig-plot { flex: 1 1 400px; max-width: 500px; min-width: 300px; }
+  .fig-side { flex: 1 1 280px; max-width: 340px; }
+  svg { display: block; height: auto; max-width: 100%; }
+  .axis { stroke: var(--rule); stroke-width: 1; }
+  .grid-l { stroke: var(--rule); stroke-width: 0.5; }
+  .dot { fill: var(--faint); opacity: 0.55; }
+  .dot-hi { fill: var(--muted); opacity: 0.9; }
+  .path { fill: none; stroke-linecap: round; stroke-width: 2.4; }
+  .path-linear { stroke: var(--warm); }
+  .path-iso { stroke: var(--accent); }
+  .path-direct { stroke: var(--muted); stroke-dasharray: 2 6; stroke-width: 1.8; }
+  .node-start { fill: var(--warm); stroke: var(--surface); stroke-width: 2.5; }
+  .node-target { fill: var(--accent); stroke: var(--surface); stroke-width: 2.5; }
+  .ax-lbl {
+    fill: var(--muted);
+    font-family: var(--sans);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+  }
+  .quad-lbl { fill: var(--faint); font-family: var(--sans); font-size: 10.5px; font-style: italic; }
+  .pt-lbl { fill: var(--muted); font-family: var(--sans); font-size: 10px; }
+  .callout { fill: none; stroke: var(--warm); stroke-dasharray: 3 3; stroke-width: 1; opacity: 0.8; }
+
+  .legend { display: flex; flex-direction: column; gap: 15px; margin: 0 0 22px; }
+  .leg-row { display: flex; gap: 12px; }
+  .leg-swatch { border-radius: 2px; flex: none; height: 3px; margin-top: 9px; width: 24px; }
+  .leg-name {
+    display: block;
+    font-family: var(--sans);
+    font-size: 12.5px;
+    font-weight: 640;
+    letter-spacing: 0.02em;
+  }
+  .leg-desc { color: var(--muted); display: block; font-size: 14px; line-height: 1.42; }
+  figcaption {
+    border-top: 1px solid var(--rule);
+    color: var(--muted);
+    font-size: 14px;
+    line-height: 1.5;
+    margin-top: 26px;
+    padding-top: 16px;
+    text-wrap: pretty;
+  }
+  figcaption b { color: var(--ink-2); font-weight: 620; }
+
+  /* ---------- tables ---------- */
+  .t-scroll { margin: 0 auto 6px; max-width: 1080px; overflow-x: auto; }
+  table { border-collapse: collapse; font-size: 14.5px; min-width: 640px; width: 100%; }
+  caption {
+    color: var(--muted);
+    font-family: var(--sans);
+    font-size: 11.5px;
+    font-weight: 620;
+    letter-spacing: 0.09em;
+    padding-bottom: 12px;
+    text-align: left;
+    text-transform: uppercase;
+  }
+  th {
+    border-bottom: 1px solid var(--ink-2);
+    color: var(--ink);
+    font-family: var(--sans);
+    font-size: 11.5px;
+    font-weight: 640;
+    letter-spacing: 0.05em;
+    padding: 0 14px 9px 0;
+    text-align: left;
+    text-transform: uppercase;
+    vertical-align: bottom;
+  }
+  td {
+    border-bottom: 1px solid var(--rule);
+    color: var(--ink-2);
+    padding: 12px 14px 12px 0;
+    vertical-align: top;
+  }
+  td:first-child { color: var(--ink); font-weight: 560; }
+  td.num { font-family: var(--sans); font-variant-numeric: tabular-nums; }
+
+  .pill {
+    border-radius: 3px;
+    display: inline-block;
+    font-family: var(--sans);
+    font-size: 10.5px;
+    font-weight: 660;
+    letter-spacing: 0.06em;
+    padding: 3px 8px;
+    white-space: nowrap;
+  }
+  .p0 { background: var(--accent-soft); color: var(--accent); }
+  .p1 { background: var(--warm-soft); color: var(--warm); }
+  .p2 { background: var(--surface-2); color: var(--muted); }
+
+  /* ---------- feasibility ---------- */
+  .check-grid {
+    display: grid;
+    gap: 1px;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    background: var(--rule);
+    border: 1px solid var(--rule);
+    margin: 0 auto 26px;
+    max-width: 1080px;
+  }
+  .check {
+    background: var(--surface);
+    padding: 18px 20px;
+  }
+  .check .tick {
+    color: var(--accent);
+    font-family: var(--sans);
+    font-size: 11px;
+    font-weight: 680;
+    letter-spacing: 0.08em;
+  }
+  .check .what {
+    display: block;
+    font-size: 15.5px;
+    font-weight: 600;
+    margin: 7px 0 5px;
+  }
+  .check .ev { color: var(--muted); font-family: var(--mono); font-size: 12px; line-height: 1.5; }
+
+  pre {
+    background: var(--surface);
+    border: 1px solid var(--rule);
+    border-left: 3px solid var(--accent);
+    color: var(--ink-2);
+    font-family: var(--mono);
+    font-size: 12.5px;
+    line-height: 1.66;
+    margin: 0 auto 22px;
+    max-width: 1080px;
+    overflow-x: auto;
+    padding: 20px 22px;
+  }
+  pre b { color: var(--ink); font-weight: 600; }
+  pre .c { color: var(--faint); }
+  pre .g { color: var(--accent); }
+
+  /* ---------- callout ---------- */
+  .note {
+    background: var(--surface-2);
+    border-left: 3px solid var(--warm);
+    margin: 0 auto 20px;
+    max-width: 660px;
+    padding: 18px 22px;
+  }
+  .note p { color: var(--ink-2); font-size: 15.5px; margin: 0; }
+  .note .hd {
+    color: var(--warm);
+    display: block;
+    font-family: var(--sans);
+    font-size: 11px;
+    font-weight: 660;
+    letter-spacing: 0.09em;
+    margin-bottom: 7px;
+    text-transform: uppercase;
+  }
+
+  footer {
+    border-top: 1px solid var(--rule);
+    color: var(--faint);
+    font-family: var(--sans);
+    font-size: 12.5px;
+    line-height: 1.6;
+    margin: 0 auto;
+    max-width: 1080px;
+    padding-top: 26px;
+  }
+
+  @media (max-width: 700px) {
+    body { font-size: 16px; padding: 0 18px 64px; }
+    header.mast { padding-top: 48px; }
+    figure { padding: 22px 18px 18px; }
+    .sec-head { gap: 12px; }
+  }
+</style>
+
+<div class="wrap">
+
+<header class="mast">
+  <p class="eyebrow">HCI Pilot Study · Project Proposal</p>
+  <h1>Path or Destination</h1>
+  <p class="thesis">Every ambient sound app delivers a soundscape the instant you pick it. Music therapy says you should be led there gradually. We built the engine to test which is right.</p>
+  <div class="meta">
+    <span><b>Platform</b> Moodist fork · 89 sounds</span>
+    <span><b>Design</b> Within-subjects, 3 conditions</span>
+    <span><b>Status</b> Architectural spike complete</span>
+  </div>
+</header>
+
+<section>
+  <div class="sec-head"><span class="sec-num">01</span><h2>Context and motivation</h2></div>
+  <div class="col">
+    <p>Ambient sound applications treat a soundscape as a <em class="term">destination</em>. In Moodist, Noisli, myNoise and Calm, the user selects a preset and it plays unchanged until they stop it. The implicit model is that each soundscape carries a fixed affective character, and the user's task is to select correctly.</p>
+
+    <p>Two literatures suggest that model is incomplete.</p>
+
+    <p><strong>Sound has measurable affective structure.</strong> Russell's circumplex model organises affect along valence and arousal. Critically for us, Axelsson, Nilsson and Berglund found that soundscape perception loads onto <em class="term">pleasantness</em> and <em class="term">eventfulness</em> — essentially the same two dimensions, but derived independently from environmental audio rather than borrowed from music research. That structure now underpins the ISO 12913 soundscape standard. Per-sound affective coordinates already exist in published norm datasets: IADS-2 and IADS-E, and Emo-Soundscapes, which derives valence and arousal for over a thousand clips through crowdsourced pairwise comparison. Placing 89 ambient sounds in a shared affective space is therefore well-precedented rather than speculative.</p>
+
+    <p><strong>Sound demonstrably moves affect.</strong> Alvarsson, Wiens and Nilsson showed that nature sound accelerates physiological recovery from a stressor relative to noise at matched sound pressure levels. Juslin and Västfjäll's mechanism framework separates the routes by which sound induces emotion — brain-stem reflex, rhythmic entrainment, evaluative conditioning, episodic memory, musical expectancy. Ambient sound is a theoretically interesting case precisely because it engages the reflexive and associative routes while largely bypassing musical expectancy, which is where most affective-audio research has concentrated.</p>
+
+    <p><strong>Neither literature settles whether the path matters.</strong> The iso-principle — meet the listener in their present state, then move them gradually — has been standard music therapy practice since Altshuler and prescribes exactly a trajectory rather than a destination. But its evidence base is thin, largely clinical, and has not been tested for non-musical soundscapes or in a self-administered interface. Meanwhile every consumer ambient app implements the opposite by default.</p>
+
+    <p>Framed through Gross's process model of emotion regulation, choosing a soundscape is <em class="term">situation selection</em>: a single act. A guided transition is closer to sustained <em class="term">attentional deployment</em> — a different regulatory mechanism with a different predicted time course. The gap is narrow and testable. We know sounds carry affective coordinates, and we know sound shifts affect. We do not know whether <em class="term">traversing</em> the space between two affective states accomplishes anything that arriving directly does not.</p>
+  </div>
+</section>
+
+<section>
+  <div class="sec-head"><span class="sec-num">02</span><h2>Research question</h2></div>
+  <div class="rq">
+    <span class="lbl">Primary</span>
+    <p class="primary">Does guiding a listener along a gradual trajectory through valence–arousal space produce a different affective shift than presenting the same target soundscape directly?</p>
+    <div class="sub">
+      <p><span class="tag">RQ2</span>Does the <em class="term">shape</em> of that trajectory matter — straight-line interpolation versus an iso-principle path that holds at the listener's reported state before moving?</p>
+      <p><span class="tag">RQ3</span>Does the ecological coherence of intermediate mixes affect perceived quality, and does incoherence undermine any benefit the trajectory provides?</p>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="sec-head"><span class="sec-num">03</span><h2>The manipulation</h2></div>
+  <div class="col">
+    <p>All three conditions start from the same reported state, end at the same target mix, and run for the same duration. The only thing that varies is the route. The plot below shows all 89 Moodist sounds at their current affective coordinates, with the three paths our engine generates for a representative transition.</p>
+  </div>
+  <figure style="margin-top:26px">
+    <div class="fig-inner">
+      <div class="fig-plot">
+        <svg viewBox="0 0 448 412" role="img" aria-label="Valence-arousal scatter plot of 89 ambient sounds with three transition paths overlaid">
+          <line class="grid-l" x1="224" y1="30" x2="224" y2="390"/>
+          <line class="grid-l" x1="44" y1="210" x2="404" y2="210"/>
+          <rect class="axis" x="44" y="30" width="360" height="360" fill="none"/>
+
+          <text class="quad-lbl" x="52" y="46">tense · agitated</text>
+          <text class="quad-lbl" x="396" y="46" text-anchor="end">excited · alert</text>
+          <text class="quad-lbl" x="52" y="380">flat · listless</text>
+          <text class="quad-lbl" x="396" y="380" text-anchor="end">calm · content</text>
+
+          <circle class="dot" cx="188.0" cy="156.0" r="2.4"/><circle class="dot" cx="350.0" cy="228.0" r="2.4"/><circle class="dot dot-hi" cx="368.0" cy="318.0" r="3.4"/><circle class="dot" cx="260.0" cy="192.0" r="2.4"/><circle class="dot" cx="278.0" cy="246.0" r="2.4"/><circle class="dot" cx="314.0" cy="300.0" r="2.4"/><circle class="dot" cx="152.0" cy="174.0" r="2.4"/><circle class="dot" cx="152.0" cy="120.0" r="2.4"/><circle class="dot" cx="278.0" cy="264.0" r="2.4"/><circle class="dot" cx="242.0" cy="120.0" r="2.4"/><circle class="dot" cx="242.0" cy="264.0" r="2.4"/><circle class="dot" cx="278.0" cy="174.0" r="2.4"/><circle class="dot" cx="296.0" cy="318.0" r="2.4"/><circle class="dot" cx="170.0" cy="156.0" r="2.4"/><circle class="dot" cx="242.0" cy="174.0" r="2.4"/><circle class="dot" cx="260.0" cy="246.0" r="2.4"/><circle class="dot" cx="224.0" cy="138.0" r="2.4"/><circle class="dot dot-hi" cx="224.0" cy="354.0" r="3.4"/><circle class="dot" cx="206.0" cy="84.0" r="2.4"/><circle class="dot" cx="242.0" cy="300.0" r="2.4"/><circle class="dot dot-hi" cx="368.0" cy="282.0" r="3.4"/><circle class="dot" cx="296.0" cy="282.0" r="2.4"/><circle class="dot" cx="152.0" cy="156.0" r="2.4"/><circle class="dot" cx="278.0" cy="192.0" r="2.4"/><circle class="dot" cx="350.0" cy="246.0" r="2.4"/><circle class="dot" cx="278.0" cy="228.0" r="2.4"/><circle class="dot" cx="242.0" cy="210.0" r="2.4"/><circle class="dot" cx="296.0" cy="228.0" r="2.4"/><circle class="dot" cx="314.0" cy="174.0" r="2.4"/><circle class="dot" cx="350.0" cy="264.0" r="2.4"/><circle class="dot" cx="332.0" cy="264.0" r="2.4"/><circle class="dot" cx="278.0" cy="282.0" r="2.4"/><circle class="dot" cx="242.0" cy="228.0" r="2.4"/><circle class="dot" cx="206.0" cy="174.0" r="2.4"/><circle class="dot" cx="170.0" cy="138.0" r="2.4"/><circle class="dot" cx="296.0" cy="174.0" r="2.4"/><circle class="dot" cx="278.0" cy="138.0" r="2.4"/><circle class="dot" cx="260.0" cy="264.0" r="2.4"/><circle class="dot dot-hi" cx="80.0" cy="84.0" r="3.4"/><circle class="dot dot-hi" cx="224.0" cy="102.0" r="3.4"/><circle class="dot" cx="206.0" cy="192.0" r="2.4"/><circle class="dot" cx="296.0" cy="282.0" r="2.4"/><circle class="dot" cx="278.0" cy="156.0" r="2.4"/><circle class="dot" cx="134.0" cy="120.0" r="2.4"/><circle class="dot" cx="188.0" cy="174.0" r="2.4"/><circle class="dot" cx="296.0" cy="300.0" r="2.4"/><circle class="dot" cx="260.0" cy="300.0" r="2.4"/><circle class="dot" cx="296.0" cy="192.0" r="2.4"/><circle class="dot" cx="350.0" cy="282.0" r="2.4"/><circle class="dot" cx="332.0" cy="246.0" r="2.4"/><circle class="dot dot-hi" cx="368.0" cy="300.0" r="3.4"/><circle class="dot" cx="188.0" cy="102.0" r="2.4"/><circle class="dot" cx="296.0" cy="210.0" r="2.4"/><circle class="dot" cx="206.0" cy="228.0" r="2.4"/><circle class="dot dot-hi" cx="224.0" cy="210.0" r="3.4"/><circle class="dot" cx="224.0" cy="156.0" r="2.4"/><circle class="dot" cx="260.0" cy="228.0" r="2.4"/><circle class="dot dot-hi" cx="332.0" cy="318.0" r="3.4"/><circle class="dot" cx="170.0" cy="156.0" r="2.4"/><circle class="dot" cx="242.0" cy="156.0" r="2.4"/><circle class="dot" cx="296.0" cy="246.0" r="2.4"/><circle class="dot" cx="332.0" cy="264.0" r="2.4"/><circle class="dot" cx="242.0" cy="192.0" r="2.4"/><circle class="dot" cx="314.0" cy="264.0" r="2.4"/><circle class="dot" cx="206.0" cy="246.0" r="2.4"/><circle class="dot" cx="260.0" cy="174.0" r="2.4"/><circle class="dot dot-hi" cx="62.0" cy="48.0" r="3.4"/><circle class="dot" cx="134.0" cy="120.0" r="2.4"/><circle class="dot" cx="170.0" cy="120.0" r="2.4"/><circle class="dot dot-hi" cx="260.0" cy="84.0" r="3.4"/><circle class="dot" cx="188.0" cy="174.0" r="2.4"/><circle class="dot dot-hi" cx="116.0" cy="120.0" r="3.4"/>
+
+          <ellipse class="callout" cx="228" cy="207" rx="34" ry="26"/>
+          <text class="pt-lbl" x="228" y="252" text-anchor="middle" fill="var(--warm)">appliance hum</text>
+
+          <path class="path path-direct" d="M 116 84 Q 260 96 332 318"/>
+          <polyline class="path path-linear" points="116.0,84.0 152.0,123.0 188.0,162.0 224.0,201.0 260.0,240.0 296.0,279.0 332.0,318.0"/>
+          <polyline class="path path-iso" points="116.0,84.0 116.0,84.0 116.0,318.0 332.0,318.0"/>
+
+          <circle class="node node-start" cx="116.0" cy="84.0" r="6"/>
+          <circle class="node node-target" cx="332.0" cy="318.0" r="6"/>
+          <text class="pt-lbl" x="126" y="76" fill="var(--warm)">start</text>
+          <text class="pt-lbl" x="326" y="334" text-anchor="end" fill="var(--accent)">target</text>
+
+          <text class="ax-lbl" x="44" y="408">Unpleasant</text>
+          <text class="ax-lbl" x="404" y="408" text-anchor="end">Pleasant</text>
+          <text class="ax-lbl" x="32" y="34" text-anchor="end" transform="rotate(-90 32 34)">High arousal</text>
+          <text class="ax-lbl" x="32" y="390" text-anchor="start" transform="rotate(-90 32 390)">Low arousal</text>
+        </svg>
+      </div>
+      <div class="fig-side">
+        <div class="legend">
+          <div class="leg-row">
+            <span class="leg-swatch" style="background:var(--muted)"></span>
+            <span><span class="leg-name">Direct</span><span class="leg-desc">Control. The target mix plays from the first second. This is what every existing app does.</span></span>
+          </div>
+          <div class="leg-row">
+            <span class="leg-swatch" style="background:var(--warm)"></span>
+            <span><span class="leg-name">Linear</span><span class="leg-desc">Straight-line interpolation. Passes through the affectively neutral centre — which in this library is populated almost entirely by machine noise.</span></span>
+          </div>
+          <div class="leg-row">
+            <span class="leg-swatch" style="background:var(--accent)"></span>
+            <span><span class="leg-name">Iso-principle</span><span class="leg-desc">Holds at the listener's reported state, resolves arousal first, then valence — sound manipulates arousal more reliably than valence.</span></span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <figcaption><b>All 89 Moodist sounds at provisional valence–arousal coordinates.</b> The spike already produced a design finding worth testing: straight-line interpolation drags the listener through the centre of the space, where the nearest sounds are <em class="term">dryer</em>, <em class="term">washing machine</em>, <em class="term">slide projector</em> and <em class="term">office</em>. Geometrically it is the shortest route; experientially it routes you through a laundry room. The iso path avoids the centre entirely.</figcaption>
+  </figure>
+</section>
+
+<section>
+  <div class="sec-head"><span class="sec-num">04</span><h2>Implementation</h2></div>
+  <div class="col">
+    <p>The system is a fork of Moodist, an open-source ambient sound web app built with Astro, React, Zustand and Howler.js. Forking rather than building from scratch gives us 89 licensed, locally hosted sounds and a working mixer on day one, so the engineering effort goes into the manipulation rather than the substrate.</p>
+
+    <p>The transition engine drives a position through valence–arousal space and renders that position as a sound mix — a Gaussian kernel over the <em class="term">k</em> nearest sounds, normalised so the closest sound always sits at full gain. Volume for every sound on the trajectory is written to the store on each tick at 20 Hz.</p>
+
+    <h3>Priority ordering</h3>
+  </div>
+  <div class="t-scroll" style="margin-top:22px">
+    <table>
+      <caption>Study-critical work is P0; everything else is explicitly deferred</caption>
+      <thead>
+        <tr><th style="width:26%">Component</th><th style="width:11%">Priority</th><th style="width:14%">Status</th><th>Notes</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Transition engine</td><td><span class="pill p0">P0</span></td><td>Built</td><td>Three path shapes, tick driver, trajectory preloading. Verified end to end.</td></tr>
+        <tr><td>Affect coordinate map</td><td><span class="pill p0">P0</span></td><td>Provisional</td><td>89 sounds placed. Must be re-grounded empirically before the pilot — see below.</td></tr>
+        <tr><td>Mood picker UI</td><td><span class="pill p0">P0</span></td><td>To build</td><td>Two-step grid: current state, then target. Doubles as the Affect Grid measure.</td></tr>
+        <tr><td>Study harness</td><td><span class="pill p0">P0</span></td><td>To build</td><td>Condition assignment, timed probes, event logging to JSON. Without this there is no study.</td></tr>
+        <tr><td>Ecological coherence constraint</td><td><span class="pill p1">P1</span></td><td>Deferred</td><td>Veto matrix for implausible co-occurrence. Needed only if RQ3 becomes primary.</td></tr>
+        <tr><td>Per-user coordinate adaptation</td><td><span class="pill p2">P2</span></td><td>Out of scope</td><td>Interesting, but adds a second manipulation the pilot cannot resolve.</td></tr>
+        <tr><td>Biofeedback closed loop</td><td><span class="pill p2">P2</span></td><td>Out of scope</td><td>Contingent on sensor access; would change the design from open to closed loop.</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="col" style="margin-top:34px">
+    <h3>Grounding the affect map</h3>
+    <p>The current coordinates are author-assigned first-pass values, sufficient to get the engine running but not defensible as study stimuli. Before the pilot they will be replaced by one of two routes: anchoring to published norms by matching Moodist sounds to their nearest IADS-E or Emo-Soundscapes equivalents, or running our own rating pass. If we rate them ourselves we will use <strong>pairwise comparison</strong> rather than absolute rating — people are unreliable at "rate this sound 1–9 on pleasantness" but consistent at "which of these two is more pleasant" — and fit a Bradley–Terry model to recover a scale.</p>
+
+    <div class="note">
+      <span class="hd">Known limitation, stated up front</span>
+      <p>A mix's affect is not the weighted mean of its components. Rain plus thunder is not the average of rain and thunder. Our engine assumes additivity, which is almost certainly false at the margins. The pilot holds this constant across conditions rather than solving it, so it cannot confound the comparison — but it bounds what we can claim.</p>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="sec-head"><span class="sec-num">05</span><h2>Evaluation study</h2></div>
+  <div class="col">
+    <p>Within-subjects, three conditions, order counterbalanced by Latin square. Target <strong>n = 15</strong> for the pilot. Participants are blind to condition, and all conditions are framed identically to hold expectancy constant.</p>
+
+    <p>Sessions run on separate days to avoid carryover, with the standardised induction repeated each time.</p>
+
+    <h3>Protocol per session</h3>
+    <ol>
+      <li>Consent and baseline: Affect Grid and SAM.</li>
+      <li><strong>Mood induction.</strong> A brief validated stressor — timed mental arithmetic with performance feedback — to move participants into the high-arousal, negative-valence region. Without this, participants arriving already calm have no transition to make, and starting points are incomparable across people.</li>
+      <li>Manipulation check: Affect Grid. If induction failed, the session is flagged rather than discarded.</li>
+      <li>Participant sets their target state on the grid; the assigned condition runs for 10 minutes.</li>
+      <li>Affect Grid probe every 2 minutes during listening — five probes, giving a trajectory rather than a pre/post pair.</li>
+      <li>Post-session: Affect Grid, SAM, and ratings of perceived pleasantness, coherence, and whether the soundscape "felt like it was going somewhere".</li>
+      <li>Semi-structured interview after the final session only, covering all three conditions.</li>
+    </ol>
+
+    <h3>What the design controls</h3>
+    <p>Destination and duration are held identical across conditions, so any difference is attributable to path alone. This is the design's main strength and the reason we can run a small <em class="term">n</em>.</p>
+
+    <div class="note">
+      <span class="hd">Confound we are accepting</span>
+      <p>The direct condition, by construction, exposes participants to the target mix for longer than the trajectory conditions do. This biases the comparison <em class="term">against</em> our hypothesis, which makes it conservative — a positive result survives the confound, a null result is partly explained by it. We will report cumulative target exposure per condition and treat it as a covariate.</p>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="sec-head"><span class="sec-num">06</span><h2>Data collected</h2></div>
+  <div class="t-scroll">
+    <table>
+      <caption>Per participant, per condition</caption>
+      <thead>
+        <tr><th style="width:23%">Measure</th><th style="width:16%">Instrument</th><th style="width:20%">Timing</th><th>Serves</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Valence and arousal</td><td>Affect Grid</td><td class="num">8 points per session</td><td>Primary outcome. Same 2D structure as the input UI, so no translation loss.</td></tr>
+        <tr><td>Affective state</td><td>SAM</td><td class="num">Pre and post</td><td>Validated cross-check on the single-item grid.</td></tr>
+        <tr><td>Perceived coherence</td><td>7-point scale</td><td class="num">Post</td><td>RQ3. Expected to separate linear from iso.</td></tr>
+        <tr><td>Perceived direction</td><td>7-point scale</td><td class="num">Post</td><td>Did the transition read as intentional, or as random drift?</td></tr>
+        <tr><td>Engine trace</td><td>JSON event log</td><td class="num">20 Hz, continuous</td><td>Exact position and mix at every tick. Lets us align self-report to what was actually audible.</td></tr>
+        <tr><td>Behavioural</td><td>Interaction log</td><td class="num">Continuous</td><td>Early exits, volume overrides, dwell. Free, and a check against demand characteristics.</td></tr>
+        <tr><td>Heart rate</td><td>Chest strap</td><td class="num">Continuous</td><td>Contingent on hardware. Arousal corroboration; treated as secondary.</td></tr>
+        <tr><td>Qualitative</td><td>Interview</td><td class="num">Final session</td><td>Explains the numbers, and surfaces failure modes the scales miss.</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="col" style="margin-top:26px">
+    <p>On physiological measurement: if only one sensor is available, <strong>electrodermal activity is the better arousal correlate than skin temperature</strong>, which moves on a timescale of tens of minutes and will be too sluggish for a 10-minute session. Webcam-based facial expression analysis is deliberately excluded — listeners hold a near-neutral face throughout audio-only tasks, so the signal carries almost nothing. Remote photoplethysmography from the same webcam is a more plausible fallback, since it recovers heart rate rather than expression, but we treat it as exploratory.</p>
+  </div>
+</section>
+
+<section>
+  <div class="sec-head"><span class="sec-num">07</span><h2>Feasibility, confirmed</h2></div>
+  <div class="col">
+    <p>The architectural spike is complete. Every layer the study depends on has been downloaded, run and verified, not assumed.</p>
+  </div>
+  <div class="check-grid" style="margin-top:24px">
+    <div class="check">
+      <span class="tick">✓ VERIFIED</span>
+      <span class="what">Platform runs locally</span>
+      <span class="ev">Astro 6.4 dev server up in 495 ms · 89 sounds · 117 MB audio served locally, no CDN dependency</span>
+    </div>
+    <div class="check">
+      <span class="tick">✓ VERIFIED</span>
+      <span class="what">Mixer is programmatically drivable</span>
+      <span class="ev">Zustand store exposes setVolume(id, v) per sound; Howler.js handles playback and gain</span>
+    </div>
+    <div class="check">
+      <span class="tick">✓ VERIFIED</span>
+      <span class="what">Engine produces correct trajectories</span>
+      <span class="ev">41 ticks over a 2 s run at 20 Hz · 27 sounds preloaded · 5 audible at target, 22 correctly silenced</span>
+    </div>
+    <div class="check">
+      <span class="tick">✓ VERIFIED</span>
+      <span class="what">Integrates and compiles</span>
+      <span class="ev">Full production build passes with engine included · 8.63 s</span>
+    </div>
+  </div>
+  <pre><span class="c">$ node run.ts   # iso-principle path, 2s compressed run</span>
+
+<span class="c">prepared/pre-selected 27 sounds</span>
+t=0.00  v=-0.60 a=0.70  │ <b>traffic</b>:0.70  <b>construction-site</b>:0.70  subway-station:0.67
+t=0.20  v=-0.60 a=0.70  │ <b>traffic</b>:0.70  <b>construction-site</b>:0.70  subway-station:0.67
+t=0.41  v=-0.60 a=0.15  │ <b>crows</b>:0.70  howling-wind:0.64  wolf:0.50
+t=0.61  v=-0.60 a=-0.56 │ <b>submarine</b>:0.70  binaural-delta:0.56  clock:0.47
+t=0.82  v=0.01  a=-0.60 │ <b>binaural-theta</b>:0.70  binaural-delta:0.63  underwater:0.61
+t=1.00  v=0.60  a=-0.60 │ <b>singing-bowl</b>:0.70  crickets:0.63  whale:0.57
+
+<span class="g">DONE in 41 ticks. audible at end: 5, silenced: 22</span></pre>
+  <div class="col">
+    <h3>One architectural finding</h3>
+    <p>Moodist's store exposes an <code style="font-family:var(--mono);font-size:13px">override()</code> method that sets an entire mix at once, which looks like the obvious primitive for a transition engine. It is not: <code style="font-family:var(--mono);font-size:13px">override()</code> internally calls <code style="font-family:var(--mono);font-size:13px">unselectAll()</code>, which resets every volume and deselects every sound. Called at tick rate it would thrash Howler's play/pause cycle and produce audible dropouts. The engine instead selects the union of every sound the trajectory will touch exactly once, then only mutates volume — which also solves preloading for free, since selected sounds load immediately and fade in gaplessly. Finding this before writing the study harness is precisely what the spike was for.</p>
+  </div>
+</section>
+
+<section>
+  <div class="sec-head"><span class="sec-num">08</span><h2>Expected results and contribution</h2></div>
+  <div class="col">
+    <p>We expect the iso condition to produce the largest arousal reduction, direct the smallest, and linear to land between them while scoring lowest on perceived coherence — because it routes through the machine-noise centre of the space. If that pattern holds, it separates two things that are usually confounded in ambient audio research: the affective content of a soundscape, and the experience of being moved through it.</p>
+
+    <p>A null result is equally informative at pilot scale, and we should say so before running rather than after. If direct delivery matches the trajectory conditions, that is evidence that the entire adaptive-transition premise underlying a growing category of wellbeing apps is unnecessary, and that the engineering effort is better spent on selection interfaces than on transition engines. Either outcome answers the question.</p>
+
+    <h3>Contribution</h3>
+    <ul>
+      <li><strong>An empirical test of path versus destination</strong> in affective soundscape delivery — to our knowledge the first, and directly relevant to a product category that has standardised on one answer without testing it.</li>
+      <li><strong>An open-source affective transition engine</strong> released as a Moodist fork, reusable by other researchers rather than trapped in a study apparatus.</li>
+      <li><strong>An affect-labelled dataset</strong> of 89 ambient sounds with documented rating methodology.</li>
+      <li><strong>A design finding on ecological coherence</strong> — that affective proximity and scene plausibility come apart, and that optimising for the former alone produces mixes that are affectively correct and experientially absurd.</li>
+    </ul>
+  </div>
+</section>
+
+<section>
+  <div class="sec-head"><span class="sec-num">09</span><h2>Open decisions</h2></div>
+  <div class="col">
+    <p>Four things are unresolved and shape the work materially:</p>
+    <ul>
+      <li><strong>Sensor access.</strong> Determines whether physiological measurement is a real secondary outcome or a footnote, and whether closed-loop control is reachable at all.</li>
+      <li><strong>Participant pool and sessions.</strong> Three separate days per participant is demanding. If we must run single-session, we need a washout design and the confound analysis changes.</li>
+      <li><strong>Induction method.</strong> Timed arithmetic is convenient but weak. A validated film clip induces more reliably but takes longer and raises ethics questions.</li>
+      <li><strong>Affect map grounding.</strong> Anchoring to published norms is faster; our own pairwise pass is more defensible and is itself a contribution. This is a schedule decision more than a scientific one.</li>
+    </ul>
+  </div>
+</section>
+
+<footer>
+  <p>Citations in section 1 are given by author and finding rather than full reference, and should be verified against the primary sources before submission. Affect coordinates shown in the plot are provisional author ratings, not empirical norms — see section 4.</p>
+</footer>
+
+</div>

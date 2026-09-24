@@ -1,0 +1,369 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Literature Review — Guiding Mood Through Sound (Draft 2)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,800;1,600&family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,700;1,9..40,400&display=swap" rel="stylesheet">
+<style>
+  /* Draft 2: same monochrome look as draft 1 and the group's project-plan deck,
+     but one idea per slide, one figure per slide, larger type, fewer words. */
+  :root{
+    --paper:#ffffff; --ink:#0b0b0b; --ink2:#2b2b2b; --muted:#6b6b6b; --faint:#9a9a9a;
+    --rule:#d9d9d9; --wash:#f3f3f3; --teal:#31d1c2; --amber:#e9a13a;
+    --serif:'Playfair Display','Iowan Old Style',Georgia,serif;
+    --sans:'DM Sans',ui-sans-serif,-apple-system,'Segoe UI',system-ui,sans-serif;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;background:#e9e9e9;font-family:var(--sans);color:var(--ink)}
+  @page{size:1920px 1080px;margin:0}
+  .slide{
+    position:relative;width:1920px;height:1080px;background:var(--paper);overflow:hidden;
+    padding:72px 96px 84px;margin:0 auto 24px;page-break-after:always;break-after:page;
+  }
+  @media print{body{background:#fff}.slide{margin:0}}
+
+  /* halftone ring ornaments */
+  .ht{position:absolute;width:560px;height:560px;pointer-events:none;opacity:.85;
+    background-image:radial-gradient(circle,#111 0 2.6px,transparent 2.9px);
+    background-size:16px 16px;
+    -webkit-mask-image:radial-gradient(circle at 50% 50%,transparent 0 34%,#000 41%,#000 52%,transparent 60%);
+    mask-image:radial-gradient(circle at 50% 50%,transparent 0 34%,#000 41%,#000 52%,transparent 60%)}
+  .ht.tr{top:-280px;right:-280px}
+  .ht.bl{bottom:-280px;left:-280px}
+  .ht.tl{top:-280px;left:-280px}
+  .ht.br{bottom:-280px;right:-280px}
+  .slide>*:not(.ht):not(.num):not(.foot){position:relative}
+
+  .pill{display:inline-block;background:var(--ink);color:#fff;border-radius:999px;
+    padding:14px 34px;font-size:30px;font-weight:500;letter-spacing:.01em}
+  .pill.ghost{background:transparent;color:var(--ink);border:2px solid var(--ink)}
+  .num{position:absolute;right:96px;bottom:64px;width:112px;height:112px;border-radius:50%;
+    background:var(--ink);color:#fff;display:flex;align-items:center;justify-content:center;
+    font-size:44px;font-weight:700}
+
+  h1{font-family:var(--serif);font-weight:800;font-size:64px;line-height:1.08;letter-spacing:-.01em;margin:34px 0 0}
+  h1 .u{display:block;width:160px;height:5px;background:var(--teal);margin-top:18px}
+  .lead{font-size:32px;color:var(--muted);margin:20px 0 0;line-height:1.35}
+  .lead b{color:var(--ink);font-weight:700}
+
+  .cols{display:grid;grid-template-columns:1fr 1fr;gap:72px;margin-top:52px;align-items:start}
+
+  /* numbered points: one heading + one short line */
+  .pt{display:grid;grid-template-columns:80px 1fr;gap:24px;align-items:start;margin-bottom:44px}
+  .pt:last-child{margin-bottom:0}
+  .pt .b{width:68px;height:68px;border-radius:50%;background:var(--ink);color:#fff;font-size:36px;
+    font-weight:700;display:flex;align-items:center;justify-content:center;margin-top:2px}
+  .pt h3{margin:0;font-size:38px;font-weight:700;line-height:1.2}
+  .pt p{margin:12px 0 0;font-size:31px;color:var(--muted);line-height:1.4}
+  .pt p b{color:var(--ink);font-weight:700}
+
+  .diagram{border:1.5px solid var(--rule);border-radius:24px;background:#fff;padding:18px}
+  .cap{font-size:25px;color:var(--muted);margin:16px 0 0;line-height:1.4}
+  .cap b{color:var(--ink)}
+
+  /* finding + evidence pairs */
+  .pair h3{margin:0;font-size:38px;font-weight:700;line-height:1.2}
+  .pair p.say{margin:10px 0 24px;font-size:31px;color:var(--muted);line-height:1.4;min-height:2.8em}
+  .pair p.say b{color:var(--ink)}
+
+  /* stat tiles */
+  .stat{border:3px solid var(--ink);border-radius:32px;padding:34px 44px}
+  .stat .l{font-size:30px;color:var(--muted)}
+  .stat .v{font-size:104px;font-weight:700;line-height:1.05;margin-top:6px;letter-spacing:-.01em}
+  .stat .v span{color:var(--faint);font-weight:500}
+  .stat .d{font-size:30px;margin-top:10px}
+  .stat .d b{font-weight:700}
+  .stat .d i{color:var(--muted)}
+
+  /* two-paper cards */
+  .paper{border:3px solid var(--ink);border-radius:36px;padding:38px 48px;min-height:520px}
+  .paper .who{font-size:28px;color:var(--muted);font-weight:500}
+  .paper h3{font-family:var(--serif);font-size:54px;font-weight:800;margin:6px 0 26px;line-height:1.1}
+  .paper ul{list-style:none;margin:0;padding:0}
+  .paper li{font-size:32px;line-height:1.35;padding:16px 0;border-top:1.5px solid var(--rule)}
+  .paper li b{font-weight:700}
+  .paper li.gap{color:var(--muted)}
+  .paper li.gap b{color:var(--ink)}
+
+  .foot{position:absolute;left:96px;bottom:72px;right:340px;color:var(--muted);font-size:28px;line-height:1.4}
+  .foot b{color:var(--ink)}
+
+  .refs{margin-top:44px;font-size:29px;line-height:1.5}
+  .refs p{margin:0 0 30px;padding-left:80px;text-indent:-80px;max-width:1700px}
+  .refs i{font-style:italic}
+
+  /* title slide */
+  .title{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center}
+  .title .eyebrow{font-size:30px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink2);font-weight:500}
+  .title h1{font-size:150px;margin:24px 0 30px;letter-spacing:-.01em}
+  .title .band{background:var(--ink);color:#fff;border-radius:999px;padding:18px 48px;font-size:44px;font-style:italic;font-weight:400}
+  .title .logo{width:210px;height:210px;border-radius:50%;background:var(--ink);margin:64px auto 60px;display:flex;align-items:center;justify-content:center}
+  .title .who{font-size:34px;color:var(--ink);font-weight:500}
+  .title .course{font-size:30px;color:var(--muted);margin-top:14px}
+
+  svg text{font-family:var(--sans)}
+</style>
+</head>
+<body>
+
+<!-- ============ 1 · TITLE ============ -->
+<section class="slide title">
+  <div class="ht tl"></div><div class="ht tr"></div><div class="ht bl"></div><div class="ht br"></div>
+  <div class="eyebrow">Topic 3 – Designing interactive experiences for emotional regulation</div>
+  <h1>Literature Review</h1>
+  <div class="band">Guiding Mood Through Sound — two studies of sound-based emotion regulation</div>
+  <div class="logo">
+    <svg width="110" height="110" viewBox="0 0 100 100" fill="none" stroke="#fff" stroke-width="3">
+      <circle cx="50" cy="50" r="12"/><circle cx="50" cy="30" r="12"/><circle cx="50" cy="70" r="12"/>
+      <circle cx="30" cy="50" r="12"/><circle cx="70" cy="50" r="12"/>
+      <circle cx="36" cy="36" r="12"/><circle cx="64" cy="36" r="12"/><circle cx="36" cy="64" r="12"/><circle cx="64" cy="64" r="12"/>
+    </svg>
+  </div>
+  <div class="who">Sushant Krishnan · sthi106</div>
+  <div class="course">Advanced Human Computer Interaction – Literature Review, Draft 2</div>
+</section>
+
+<!-- ============ 2 · CONTEXT ============ -->
+<section class="slide">
+  <div class="ht tr"></div><div class="ht bl"></div>
+  <span class="pill">Our project</span>
+  <h1>Guiding mood, not just setting it<span class="u"></span></h1>
+  <div class="cols" style="grid-template-columns:1fr 720px;gap:96px">
+    <div>
+      <div class="pt"><div class="b">1</div><div>
+        <h3>Every sound gets a place on a map</h3>
+        <p>Moodist's 84 ambient sounds, placed by how <b>pleasant</b> and how <b>energising</b> they feel.</p>
+      </div></div>
+      <div class="pt"><div class="b">2</div><div>
+        <h3>A transition walks you across it</h3>
+        <p>The mix cross-fades from where you are to where you want to be.</p>
+      </div></div>
+      <div class="pt"><div class="b">3</div><div>
+        <h3>The pilot compares two routes</h3>
+        <p><b>Guided path</b> vs <b>direct arrival</b>. Same target, same time — only the route differs.</p>
+      </div></div>
+    </div>
+    <div>
+      <div class="diagram">
+        <svg viewBox="0 0 640 520" width="100%">
+          <defs><marker id="ah" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#e9a13a"/></marker></defs>
+          <line x1="60" y1="260" x2="580" y2="260" stroke="#d9d9d9" stroke-width="2"/>
+          <line x1="320" y1="30" x2="320" y2="490" stroke="#d9d9d9" stroke-width="2"/>
+          <text x="320" y="20" font-size="20" text-anchor="middle" fill="#6b6b6b">energised</text>
+          <text x="320" y="512" font-size="20" text-anchor="middle" fill="#6b6b6b">sleepy</text>
+          <text x="58" y="290" font-size="20" fill="#6b6b6b">unpleasant</text>
+          <text x="582" y="290" font-size="20" text-anchor="end" fill="#6b6b6b">pleasant</text>
+          <g fill="#c9c9c9">
+            <circle cx="120" cy="110" r="6"/><circle cx="190" cy="180" r="6"/><circle cx="250" cy="90" r="6"/>
+            <circle cx="410" cy="120" r="6"/><circle cx="470" cy="190" r="6"/><circle cx="540" cy="100" r="6"/>
+            <circle cx="150" cy="380" r="6"/><circle cx="240" cy="430" r="6"/><circle cx="380" cy="330" r="6"/>
+            <circle cx="450" cy="400" r="6"/><circle cx="520" cy="350" r="6"/><circle cx="560" cy="450" r="6"/>
+            <circle cx="300" cy="360" r="6"/><circle cx="420" cy="460" r="6"/>
+          </g>
+          <line x1="150" y1="120" x2="520" y2="400" stroke="#9a9a9a" stroke-width="3" stroke-dasharray="10 10"/>
+          <text x="330" y="235" font-size="19" fill="#6b6b6b" transform="rotate(37 330 235)">direct (control)</text>
+          <path d="M150,120 C160,300 300,400 520,400" fill="none" stroke="#e9a13a" stroke-width="7" stroke-linecap="round" marker-end="url(#ah)"/>
+          <g fill="#e9a13a"><circle cx="175" cy="235" r="8"/><circle cx="225" cy="320" r="8"/><circle cx="300" cy="372" r="8"/><circle cx="400" cy="395" r="8"/></g>
+          <text x="262" y="345" font-size="19" fill="#b57614" transform="rotate(-8 262 345)">guided path</text>
+          <circle cx="150" cy="120" r="14" fill="#0b0b0b"/>
+          <text x="172" y="112" font-size="22" font-weight="700" fill="#0b0b0b">current (tense)</text>
+          <circle cx="520" cy="400" r="14" fill="#e9a13a"/>
+          <text x="500" y="440" font-size="22" font-weight="700" text-anchor="end" fill="#0b0b0b">target (calm)</text>
+        </svg>
+      </div>
+      <p class="cap" style="margin-right:210px">The two conditions on the valence–arousal map. Grey dots are individual sounds.</p>
+    </div>
+  </div>
+  <div class="num">01</div>
+</section>
+
+<!-- ============ 3 · ARTICLE 1 · WHAT IT IS ============ -->
+<section class="slide">
+  <div class="ht tr"></div><div class="ht bl"></div>
+  <span class="pill">Article 1</span> &nbsp; <span class="pill ghost">Gaur &amp; Donnelly, 2024 · EvoMUSART, LNCS 14633</span>
+  <h1>A playlist as a path through mood space<span class="u"></span></h1>
+  <p class="lead">An algorithm that walks a playlist from a <b>start song</b> to a <b>destination song</b>, one even step at a time.</p>
+  <div class="cols" style="grid-template-columns:1fr 900px;margin-top:44px">
+    <div>
+      <div class="pt"><div class="b">1</div><div>
+        <h3>Aim one step toward the destination</h3>
+        <p>Each song moves the same distance along a straight line in valence–arousal space.</p>
+      </div></div>
+      <div class="pt"><div class="b">2</div><div>
+        <h3>Pick the song that sounds closest</h3>
+        <p>Of the <b>K nearest</b> songs to that point, take the one whose audio best matches the last — so the mood shifts without genre whiplash.</p>
+      </div></div>
+    </div>
+    <div>
+      <div class="diagram" style="padding:14px"><img src="figures/gd-fig2-example-path.png" alt="Generated playlist path from sad to happy songs" style="width:100%;display:block"></div>
+      <p class="cap" style="margin-right:210px">A 12-song path from sad to happy. Each dot is one song. — <b>Fig. 2</b>, Gaur &amp; Donnelly (2024)</p>
+    </div>
+  </div>
+  <div class="num">02</div>
+</section>
+
+<!-- ============ 4 · ARTICLE 1 · WHAT THEY FOUND ============ -->
+<section class="slide">
+  <div class="ht tr"></div><div class="ht bl"></div>
+  <span class="pill">Article 1</span> &nbsp; <span class="pill ghost">What they found</span>
+  <h1>Tested on 120,000 generated playlists — not on listeners<span class="u"></span></h1>
+  <div class="cols" style="gap:80px;margin-top:40px">
+    <div class="pair">
+      <h3>The map matters most</h3>
+      <p class="say">Smooth paths run between <b>dense</b> clusters. Sparse regions jump.</p>
+      <div class="diagram" style="padding:12px;display:inline-block"><img src="figures/gd-fig1-deezer-map.png" alt="Deezer dataset in the valence-arousal plane with dense happy and sad clusters" style="height:380px;width:auto;display:block"></div>
+      <p class="cap">Where the 18,644 songs sit. — <b>Fig. 1</b></p>
+    </div>
+    <div class="pair">
+      <h3>K is a dial</h3>
+      <p class="say">More candidates: <b>smoother sound</b>, <b>less smooth mood</b>.</p>
+      <div class="diagram" style="padding:12px;display:inline-block"><img src="figures/gd-fig6-smoothness-by-k.png" alt="Smoothness of 12-song playlists by K: mood smoothness falls as audio smoothness rises" style="height:380px;width:auto;display:block"></div>
+      <p class="cap">Mood smoothness falls as audio smoothness rises. — <b>Fig. 6</b></p>
+    </div>
+  </div>
+  <div class="foot">Their proposed next study: listeners <b>report mood, listen, report again after each song</b>. It has not been run.</div>
+  <div class="num">03</div>
+</section>
+
+<!-- ============ 5 · ARTICLE 2 · WHAT IT IS ============ -->
+<section class="slide">
+  <div class="ht tr"></div><div class="ht bl"></div>
+  <span class="pill">Article 2</span> &nbsp; <span class="pill ghost">Cochrane, Loke, Campbell &amp; Ahmadpour, 2020 · OzCHI</span>
+  <h1>Mediscape: an ocean that follows your brainwaves<span class="u"></span></h1>
+  <p class="lead">A continuous soundscape — waves, birds, wind — that helps <b>novice meditators</b> settle into a breathing rhythm. No music.</p>
+  <div class="cols" style="grid-template-columns:1fr 880px;margin-top:44px">
+    <div>
+      <div class="pt"><div class="b">1</div><div>
+        <h3>It listens to you</h3>
+        <p>A <b>Muse EEG headband</b> reads how settled you are: busy → relaxed → optimal.</p>
+      </div></div>
+      <div class="pt"><div class="b">2</div><div>
+        <h3>You settle, it settles</h3>
+        <p>The waves slow to a <b>4-second breathing rhythm</b>; birds and wind fade away. Drift, and they return.</p>
+      </div></div>
+    </div>
+    <div>
+      <div class="diagram" style="padding:26px 30px">
+        <svg viewBox="0 0 800 460" width="100%">
+          <defs><marker id="ah4" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#0b0b0b"/></marker></defs>
+          <g font-size="24" font-weight="700" fill="#0b0b0b" text-anchor="middle">
+            <!-- top: headband -->
+            <rect x="260" y="20" width="280" height="88" rx="22" fill="#fff" stroke="#0b0b0b" stroke-width="3"/>
+            <text x="400" y="58">Muse EEG headband</text><text x="400" y="88" font-size="20" font-weight="400" fill="#6b6b6b">reads brainwaves</text>
+            <!-- right: soundscape -->
+            <rect x="500" y="186" width="280" height="88" rx="22" fill="#0b0b0b"/>
+            <text x="640" y="224" fill="#fff">Ocean soundscape</text><text x="640" y="254" font-size="20" font-weight="400" fill="#cfcfcf">wave tempo · birds · wind</text>
+            <!-- bottom: breathing -->
+            <rect x="260" y="352" width="280" height="88" rx="22" fill="#fff" stroke="#0b0b0b" stroke-width="3"/>
+            <text x="400" y="390">Breathing</text><text x="400" y="420" font-size="20" font-weight="400" fill="#6b6b6b">follows the waves (≈ 4 s)</text>
+            <!-- left: state -->
+            <rect x="20" y="186" width="280" height="88" rx="22" fill="#fff" stroke="#0b0b0b" stroke-width="3"/>
+            <text x="160" y="224">How settled you are</text><text x="160" y="254" font-size="20" font-weight="400" fill="#6b6b6b">busy → relaxed → optimal</text>
+          </g>
+          <path d="M540,74 Q640,100 640,184" fill="none" stroke="#0b0b0b" stroke-width="3" marker-end="url(#ah4)"/>
+          <path d="M640,276 Q640,370 542,392" fill="none" stroke="#0b0b0b" stroke-width="3" marker-end="url(#ah4)"/>
+          <path d="M258,392 Q160,370 160,276" fill="none" stroke="#0b0b0b" stroke-width="3" marker-end="url(#ah4)"/>
+          <path d="M160,184 Q160,100 258,74" fill="none" stroke="#0b0b0b" stroke-width="3" marker-end="url(#ah4)"/>
+        </svg>
+      </div>
+      <p class="cap" style="margin-right:210px">The loop: the soundscape shapes your breathing, and your state shapes the soundscape.</p>
+    </div>
+  </div>
+  <div class="num">04</div>
+</section>
+
+<!-- ============ 6 · ARTICLE 2 · WHAT THEY FOUND ============ -->
+<section class="slide">
+  <div class="ht tr"></div><div class="ht bl"></div>
+  <span class="pill">Article 2</span> &nbsp; <span class="pill ghost">What they found</span>
+  <h1>One 25-minute session: less stress, more wellbeing<span class="u"></span></h1>
+  <p class="lead">20 novices. Questionnaires before and after, then an interview.</p>
+  <div class="cols" style="gap:48px;margin-top:44px">
+    <div class="stat">
+      <div class="l">Perceived stress · PSS, 40 = no stress</div>
+      <div class="v">37 <span>→</span> 39</div>
+      <div class="d"><b>Less stress</b> <i>· t(19) = 3.82, p &lt; .01</i></div>
+    </div>
+    <div class="stat">
+      <div class="l">Wellbeing · WHO-5, 0–100</div>
+      <div class="v">60 <span>→</span> 80</div>
+      <div class="d"><b>Higher wellbeing</b> <i>· t(19) = 4.03, p &lt; .01</i></div>
+    </div>
+  </div>
+  <div class="pt" style="margin-top:64px;margin-right:260px"><div class="b">!</div><div>
+    <h3>People followed the rhythm, not the feedback</h3>
+    <p>16 of 19 felt relaxed — but most simply breathed with the waves rather than reading them as a signal about their state. Hence the authors' guideline: <b>balance information against immersion</b>.</p>
+  </div></div>
+  <div class="num">05</div>
+</section>
+
+<!-- ============ 7 · HOW THEY RELATE ============ -->
+<section class="slide">
+  <div class="ht tr"></div><div class="ht bl"></div>
+  <span class="pill">How the articles relate</span>
+  <h1>One has the path. The other has the listeners.<span class="u"></span></h1>
+  <div class="cols" style="gap:56px;margin-top:48px">
+    <div class="paper">
+      <div class="who">Gaur &amp; Donnelly (2024)</div>
+      <h3>Has the path</h3>
+      <ul>
+        <li>Discrete <b>songs</b></li>
+        <li>Steered by a <b>chosen destination</b></li>
+        <li>Evaluated as <b>geometry</b></li>
+        <li class="gap">Never played to a <b>listener</b></li>
+      </ul>
+    </div>
+    <div class="paper">
+      <div class="who">Cochrane et al. (2020)</div>
+      <h3>Has the listeners</h3>
+      <ul>
+        <li>One continuous <b>ambient scene</b></li>
+        <li>Steered by <b>EEG</b></li>
+        <li>Evaluated with <b>20 people</b></li>
+        <li class="gap">No <b>path</b> to compare against</li>
+      </ul>
+    </div>
+  </div>
+  <div class="foot">Both treat mood as a <b>position that sound can move through gradually</b>. Neither plays a guided path to listeners, and neither moves a mix of ambient sounds across an affect map. <b>That is our pilot.</b></div>
+  <div class="num">06</div>
+</section>
+
+<!-- ============ 8 · IMPLICATIONS ============ -->
+<section class="slide">
+  <div class="ht tr"></div><div class="ht bl"></div>
+  <span class="pill">Implications</span>
+  <h1>What this means for our pilot<span class="u"></span></h1>
+  <div style="margin-top:56px;margin-right:260px">
+    <div class="pt" style="margin-bottom:52px"><div class="b">1</div><div>
+      <h3>Build the path one step at a time — on a dense map</h3>
+      <p>Gaur &amp; Donnelly's rule is what our engine does. Sparse regions will jump, so <b>check coverage along each study path</b> before we test.</p>
+    </div></div>
+    <div class="pt" style="margin-bottom:52px"><div class="b">2</div><div>
+      <h3>Keep it one scene</h3>
+      <p>Mediscape's listeners ignored the feedback and followed the rhythm. Our transition should be <b>audibly going somewhere</b> without breaking immersion.</p>
+    </div></div>
+    <div class="pt"><div class="b">3</div><div>
+      <h3>Run the listener test both papers leave open</h3>
+      <p>Report mood, listen, report again. Lead with <b>preference, sense of direction and coherence</b>; report affect change descriptively.</p>
+    </div></div>
+  </div>
+  <div class="num">07</div>
+</section>
+
+<!-- ============ 9 · REFERENCES ============ -->
+<section class="slide">
+  <div class="ht tr"></div><div class="ht bl"></div>
+  <span class="pill">References</span>
+  <h1>References (APA 7th)<span class="u"></span></h1>
+  <div class="refs">
+    <p>Cochrane, K. A., Loke, L., Campbell, A., &amp; Ahmadpour, N. (2020). Mediscape: Preliminary design guidelines for interactive rhythmic soundscapes for entraining novice mindfulness meditators. In <i>Proceedings of the 32nd Australian Conference on Human-Computer Interaction (OzCHI '20)</i> (pp. 379–391). Association for Computing Machinery. https://doi.org/10.1145/3441000.3441052</p>
+    <p>Gaur, S., &amp; Donnelly, P. J. (2024). Generating smooth mood-dynamic playlists with audio features and KNN. In C. Johnson, S. M. Rebelo, &amp; I. Santos (Eds.), <i>Artificial intelligence in music, sound, art and design: 13th International Conference, EvoMUSART 2024</i> (Lecture Notes in Computer Science, Vol. 14633, pp. 162–178). Springer. https://doi.org/10.1007/978-3-031-56992-0_11</p>
+    <p>Russell, J. A. (1980). A circumplex model of affect. <i>Journal of Personality and Social Psychology, 39</i>(6), 1161–1178. https://doi.org/10.1037/h0077714</p>
+  </div>
+  <div class="foot">Paper figures are reproduced from the two articles for this coursework and credited in their captions; all other diagrams are the author's own.</div>
+  <div class="num">08</div>
+</section>
+
+</body>
+</html>

@@ -1,0 +1,173 @@
+<title>Evaluation Study Design</title>
+<style>
+  /* Deliberately single-look: a monochrome slide for a light-mode deck.
+     No theme swap — every colour is painted explicitly so the page holds
+     on any host background. */
+  :root{
+    --paper:#FFFFFF; --ink:#000000; --ink-2:#2B2B2B; --muted:#6B6B6B;
+    --faint:#9A9A9A; --rule:#D8D8D8; --wash:#F2F2F2;
+    --serif:'Iowan Old Style','Palatino Linotype',Palatino,'Book Antiqua',Georgia,serif;
+    --sans:ui-sans-serif,-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif;
+  }
+  *{box-sizing:border-box}
+  body{background:#EDEDED;color:var(--ink);font-family:var(--sans);margin:0;padding:28px 20px 72px}
+  .wrap{margin:0 auto;max-width:1180px}
+
+  .slide{
+    aspect-ratio:16/9;background:var(--paper);border:1px solid var(--rule);
+    container-type:inline-size;color:var(--ink);display:flex;flex-direction:column;
+    justify-content:space-between;padding:3.2cqw 3.6cqw;width:100%;
+  }
+  .eyebrow{color:var(--muted);font-size:1.02cqw;font-weight:700;letter-spacing:.2em;
+    margin:0 0 1cqw;text-transform:uppercase}
+  h1{font-family:var(--serif);font-size:3.7cqw;font-weight:600;letter-spacing:-.02em;
+    line-height:1;margin:0}
+  .sub{color:var(--muted);font-size:1.4cqw;margin:.95cqw 0 0}
+  .sub b{color:var(--ink);font-weight:640}
+
+  /* ---- flow: compact, icon-led ---- */
+  .flow{display:grid;gap:2.4cqw;grid-template-columns:repeat(4,1fr)}
+  .step{border-top:1.5px solid var(--ink);padding-top:1cqw}
+  .ico{display:block;height:2.6cqw;margin-bottom:.8cqw;width:2.6cqw}
+  .ico *{stroke:var(--ink);stroke-width:1.6;fill:none;stroke-linecap:round;stroke-linejoin:round}
+  .ico .fill{fill:var(--ink);stroke:none}
+  .st{font-family:var(--serif);font-size:1.95cqw;font-weight:600;margin:0 0 .3cqw}
+  .sd{color:var(--muted);font-size:1.22cqw;line-height:1.4;margin:0}
+
+  /* ---- conditions as tiny route plots ---- */
+  .lower{display:grid;gap:3.4cqw;grid-template-columns:.92fr 1.08fr}
+  .hd{color:var(--ink);font-size:1.1cqw;font-weight:700;letter-spacing:.16em;
+    margin:0 0 .9cqw;text-transform:uppercase}
+  .conds{display:flex;flex-direction:column;gap:.7cqw}
+  .cond{align-items:center;display:flex;gap:1cqw}
+  .glyph{border:1px solid var(--rule);flex:none;height:3.4cqw;width:5.2cqw}
+  .glyph .p{fill:none;stroke:var(--ink);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+  .glyph .d{fill:var(--ink)}
+  .glyph .o{fill:var(--paper);stroke:var(--ink);stroke-width:1.5}
+  .cn{font-size:1.5cqw;font-weight:640}
+  .ct{color:var(--muted);font-size:1.18cqw}
+  .cn-wrap{display:flex;align-items:baseline;gap:.7cqw}
+
+  .mlist{display:flex;flex-wrap:wrap;gap:.5cqw;list-style:none;margin:0;padding:0}
+  .mlist li{background:var(--wash);font-size:1.3cqw;padding:.5cqw .85cqw}
+  .mlist.dim li{background:transparent;border:1px dashed var(--rule);color:var(--muted)}
+  .also{margin-top:1.1cqw}
+  .caveat{color:var(--muted);font-size:1.14cqw;font-style:italic;margin:.6cqw 0 0}
+
+  .foot{border-top:1px solid var(--rule);color:var(--muted);font-size:1.2cqw;
+    margin-top:1.2cqw;padding-top:.9cqw}
+  .foot b{color:var(--ink);font-weight:640}
+
+  /* ---- notes (not part of the slide) ---- */
+  .notes{background:var(--paper);border:1px solid var(--rule);margin:34px auto 0;
+    max-width:780px;padding:30px 34px}
+  .notes h2{font-family:var(--serif);font-size:20px;font-weight:600;margin:0 0 3px}
+  .notes .hint{color:var(--faint);font-size:13px;margin:0 0 18px}
+  .notes ol{margin:0;padding-left:20px}
+  .notes li{color:var(--ink-2);font-size:15.5px;line-height:1.6;margin-bottom:10px;padding-left:4px}
+  .notes li::marker{color:var(--faint)}
+  .notes b{color:var(--ink);font-weight:640}
+  @media (max-width:720px){.slide{aspect-ratio:auto;padding:26px 20px}}
+</style>
+
+<div class="wrap">
+<div class="slide">
+
+  <div>
+    <p class="eyebrow">Evaluation Study Design</p>
+    <h1>Same start. Same destination. Three routes.</h1>
+    <p class="sub">Within-subjects &nbsp;·&nbsp; <b>3 conditions</b> &nbsp;·&nbsp; counterbalanced &nbsp;·&nbsp; <b>n ≈ 15</b></p>
+  </div>
+
+  <div class="flow">
+    <div class="step">
+      <svg class="ico" viewBox="0 0 24 24" aria-hidden="true">
+        <rect x="3" y="3" width="18" height="18"/><path d="M3 12h18M12 3v18"/>
+        <circle class="fill" cx="7.5" cy="7.5" r="1.9"/><circle class="o" cx="16.5" cy="16.5" r="2.2"/>
+      </svg>
+      <p class="st">Report</p>
+      <p class="sd">Where you are now, and where you want to get to.</p>
+    </div>
+    <div class="step">
+      <svg class="ico" viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M4 14v-2a8 8 0 0 1 16 0v2"/>
+        <path d="M4 14h2.6a1 1 0 0 1 1 1v4a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1z"/>
+        <path d="M20 14h-2.6a1 1 0 0 0-1 1v4a1 1 0 0 0 1 1H19a1 1 0 0 0 1-1z"/>
+      </svg>
+      <p class="st">Listen</p>
+      <p class="sd">Ten minutes. One condition per session.</p>
+    </div>
+    <div class="step">
+      <svg class="ico" viewBox="0 0 24 24" aria-hidden="true">
+        <rect x="4" y="3" width="16" height="18"/><path d="M8 9h8M8 13h8M8 17h4"/>
+      </svg>
+      <p class="st">Rate</p>
+      <p class="sd">The experience, and how you feel now.</p>
+    </div>
+    <div class="step">
+      <svg class="ico" viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M20 12a8 8 0 1 1-2.6-5.9"/><path d="M20 3v4.2h-4.2"/>
+      </svg>
+      <p class="st">Repeat</p>
+      <p class="sd">All three, then a short interview.</p>
+    </div>
+  </div>
+
+  <div class="lower">
+    <div>
+      <p class="hd">The three routes</p>
+      <div class="conds">
+        <div class="cond">
+          <svg class="glyph" viewBox="0 0 44 29" aria-hidden="true">
+            <circle class="d" cx="33" cy="21" r="3"/>
+          </svg>
+          <span class="cn-wrap"><span class="cn">Fixed</span><span class="ct">control</span></span>
+        </div>
+        <div class="cond">
+          <svg class="glyph" viewBox="0 0 44 29" aria-hidden="true">
+            <path class="p" d="M11 8 L33 21"/><circle class="d" cx="11" cy="8" r="2.6"/><circle class="d" cx="33" cy="21" r="2.6"/>
+          </svg>
+          <span class="cn-wrap"><span class="cn">Linear</span><span class="ct">straight across</span></span>
+        </div>
+        <div class="cond">
+          <svg class="glyph" viewBox="0 0 44 29" aria-hidden="true">
+            <path class="p" d="M11 8 L11 21 L33 21"/><circle class="d" cx="11" cy="8" r="2.6"/><circle class="d" cx="33" cy="21" r="2.6"/>
+          </svg>
+          <span class="cn-wrap"><span class="cn">Iso-principle</span><span class="ct">settle, then shift</span></span>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <p class="hd">What we measure</p>
+      <ul class="mlist">
+        <li>Did it feel like it was going somewhere?</li>
+        <li>Pleasant?</li>
+        <li>Did it hang together?</li>
+        <li>Which did you prefer?</li>
+        <li>Describe it in your own words</li>
+      </ul>
+      <div class="also">
+        <ul class="mlist dim"><li>Calmness, before and after</li></ul>
+        <p class="caveat">Exploratory — we don't expect to shift mood at this scale.</p>
+      </div>
+    </div>
+  </div>
+
+  <p class="foot">Every condition ends at the <b>same soundscape</b> and runs the <b>same ten minutes</b>. Only the route changes.</p>
+
+</div>
+
+<div class="notes">
+  <h2>What to say</h2>
+  <p class="hint">Six lines. One per beat.</p>
+  <ol>
+    <li>Everyone hears all three conditions, in a counterbalanced order — so each person is their own control.</li>
+    <li>They tell us where they are and where they'd like to get to, then listen for ten minutes.</li>
+    <li>All three end at <b>the same soundscape</b> and last the same time. The only difference is the path taken to get there.</li>
+    <li>Afterwards they rate the experience and describe it in their own words.</li>
+    <li>We're not betting on measuring a mood change — at fifteen people that's not realistic. We're asking whether people <b>notice the journey</b>, and whether they prefer it.</li>
+    <li>If nobody can tell a guided transition from a fixed soundscape, that's a real result, and we'd find it out cheaply.</li>
+  </ol>
+</div>
+</div>
