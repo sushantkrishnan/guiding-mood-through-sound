@@ -18,6 +18,7 @@ import {
 import { buildInfo, mapHash, type BuildInfo } from './provenance';
 import {
   ENGINE_DEFAULTS,
+  type Drift,
   type EngineSettings,
   type PathShape,
 } from './transition';
@@ -277,6 +278,8 @@ export interface StudyEvent {
 export type TargetSource = 'participant' | 'first-session' | 'fixed';
 
 export interface SessionRoute {
+  /** drift only: its calibration against iso (see driftLoops) */
+  drift?: Drift;
   /** the grid answers the route was built from */
   from: GridAnswer;
   shape: Condition;

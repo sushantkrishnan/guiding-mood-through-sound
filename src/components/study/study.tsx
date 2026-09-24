@@ -31,7 +31,7 @@ import {
   type StudySetup,
   type TargetSource,
 } from '@/lib/study';
-import { frameAt, runTransition } from '@/lib/transition';
+import { driftLoops, frameAt, runTransition } from '@/lib/transition';
 import { useSettingsStore } from '@/stores/settings';
 import { useSoundStore } from '@/stores/sound';
 import { useStudyStore } from '@/stores/study';
@@ -273,11 +273,14 @@ function Session() {
     const place = (cell: GridCell) =>
       setup.fitToMap ? fitToPool(cellToPoint(cell)) : cellToPoint(cell);
 
+    const start = place(startCell);
+    const end = place(targetCell);
     const route = {
+      ...(l.condition === 'drift' ? { drift: driftLoops(start, end) } : {}),
       from: toAnswer(startCell),
       shape: l.condition,
-      start: place(startCell),
-      target: place(targetCell),
+      start,
+      target: end,
       to: toAnswer(targetCell),
       toSource: source,
     };

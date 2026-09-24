@@ -988,10 +988,10 @@ const SETTINGS: Array<{
     step: 0.05,
   },
   {
-    hint: 'loop size around the target',
+    hint: 'largest loop; calibrated to match iso',
     key: 'driftRadius',
     label: 'Drift radius',
-    max: 0.5,
+    max: 0.6,
     min: 0.05,
     step: 0.01,
   },

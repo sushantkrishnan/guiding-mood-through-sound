@@ -28,8 +28,8 @@ import {
 
 /**
  * - `direct`: the target mix from the start (control; no trajectory)
- * - `drift`:  stays at the target but circles it, changing the mix as much as
- *             `iso` does without heading anywhere (control for change itself)
+ * - `drift`:  stays at the target but circles it, changing the mix as much
+ *             as `iso` would without heading anywhere (control for change)
  * - `linear`: straight line from the reported state to the target
  * - `iso`:    iso-principle; meet the listener's energy, then move
  */
@@ -55,7 +55,7 @@ export interface TransitionOptions {
   crowd?: number;
   /** fraction of the run spent at the target after arriving (moving shapes) */
   dwell?: number;
-  /** rough radius of the figure-eight `drift` traces around the target */
+  /** largest size of the figure-eight `drift` traces around the target */
   driftRadius?: number;
   /** number of strongest sounds mixed at any moment, ties aside */
   k?: number;
@@ -87,7 +87,7 @@ export interface TransitionOptions {
 export const ENGINE_DEFAULTS = {
   coherence: 1,
   crowd: 0.8,
-  driftRadius: 0.15,
+  driftRadius: 0.3,
   dwell: 0.2,
   k: 5,
   masterGain: 0.7,
@@ -135,55 +135,168 @@ export function matchedStart(
   };
 }
 
-/** Distance `iso` travels: an arousal leg, then a valence leg. */
-export function isoLength(
-  start: AffectPoint,
+/** A point on drift's figure-eight around the target. */
+function loopPoint(
   target: AffectPoint,
-  options: TransitionOptions = {},
-) {
-  const from = matchedStart(start, options);
-
-  return (
-    Math.abs(target.arousal - from.arousal) +
-    Math.abs(target.valence - from.valence)
-  );
+  radius: number,
+  angle: number,
+): AffectPoint {
+  return {
+    arousal: target.arousal + radius * Math.sin(angle) * Math.cos(angle),
+    valence: target.valence + radius * Math.sin(angle),
+  };
 }
 
-/** Length of one loop of the figure-eight x = sin θ, y = sin θ cos θ. */
-const LOOP = (() => {
-  const steps = 2000;
-  let length = 0;
+/** Summed absolute gain change between two mixes. */
+function mixChange(a: Record<string, number>, b: Record<string, number>) {
+  let total = 0;
 
-  for (let i = 0; i < steps; i++) {
-    const a = (i / steps) * 2 * Math.PI;
-    const b = ((i + 1) / steps) * 2 * Math.PI;
-    length += Math.hypot(
-      Math.sin(b) - Math.sin(a),
-      Math.sin(b) * Math.cos(b) - Math.sin(a) * Math.cos(a),
-    );
+  new Set([...Object.keys(a), ...Object.keys(b)]).forEach(id => {
+    total += Math.abs((a[id] ?? 0) - (b[id] ?? 0));
+  });
+
+  return total;
+}
+
+const CALIBRATION_SAMPLES = 120;
+
+/** How much `iso` changes the mix, in total, between two points. */
+function isoChange(
+  start: AffectPoint,
+  target: AffectPoint,
+  options: TransitionOptions,
+) {
+  const iso: RouteShape = { ...options, shape: 'iso', start, target };
+  const steps = CALIBRATION_SAMPLES * 2;
+  let total = 0;
+  let previous: Record<string, number> | null = null;
+
+  for (let i = 0; i <= steps; i++) {
+    const u = i / steps;
+    const point = positionAt(u, start, target, 'iso', options);
+    const mix = mixAt(point, { ...iso, affinity: affinityAt(u, iso) });
+
+    if (previous) total += mixChange(previous, mix);
+    previous = mix;
   }
 
-  return length;
-})();
+  return total;
+}
+
+/** How much one drift loop of a given radius changes the mix. */
+function loopChange(route: RouteShape, radius: number) {
+  const affinity = affinityAt(1, route);
+  let total = 0;
+  let previous: Record<string, number> | null = null;
+
+  for (let i = 0; i <= CALIBRATION_SAMPLES; i++) {
+    const angle = (i / CALIBRATION_SAMPLES) * 2 * Math.PI;
+    const mix = mixAt(loopPoint(route.target, radius, angle), {
+      ...route,
+      affinity,
+    });
+
+    if (previous) total += mixChange(previous, mix);
+    previous = mix;
+  }
+
+  return total;
+}
+
+export interface Drift {
+  loops: number;
+  radius: number;
+  /**
+   * Share of iso's mix change this drift achieves: 1 unless the target sits
+   * in so sparse a region that even `MAX_DRIFT_LOOPS` wide loops fall short.
+   */
+  share: number;
+}
+
+/** more loops than this sounds like wobbling (one a minute on a 10-min run) */
+export const MAX_DRIFT_LOOPS = 8;
+
+const drifts = new Map<string, Drift>();
+const identities = new WeakMap<object, number>();
+let nextIdentity = 0;
+
+const identity = (value: object) => {
+  let id = identities.get(value);
+
+  if (id === undefined) {
+    id = nextIdentity++;
+    identities.set(value, id);
+  }
+
+  return id;
+};
 
 /**
- * Loops and radius for `drift`: whole loops (so it ends back on the target),
- * sized so the total distance matches what `iso` travels between the same
- * points. The radius therefore lands near, not exactly on, `driftRadius`.
+ * Loops and radius for `drift`, calibrated so a drift run changes the mix
+ * as much in total as `iso` would between the same points, over the same
+ * stretch of the run: the fewest whole loops (so it ends on the target)
+ * that `driftRadius` can reach, then the radius that matches exactly. Where
+ * the map is too sparse for that within `MAX_DRIFT_LOOPS`, it does what it
+ * can and says so in `share`.
+ *
+ * Matching path length is not enough: near a calm target the map is dense
+ * with similar sounds, and coherence narrows them further, so the same
+ * distance changes the mix about half as much. Cached, because the
+ * visualiser asks for every frame.
  */
 export function driftLoops(
   start: AffectPoint,
   target: AffectPoint,
   options: TransitionOptions = {},
-) {
-  const { driftRadius } = { ...ENGINE_DEFAULTS, ...options };
-  const length = isoLength(start, target, options);
+): Drift {
+  const settings = { ...ENGINE_DEFAULTS, ...options };
+  const key = JSON.stringify([
+    start,
+    target,
+    settings.k,
+    settings.sigma,
+    settings.crowd,
+    settings.coherence,
+    settings.matchValenceFloor,
+    settings.driftRadius,
+    identity(options.pool ?? affect),
+    identity(options.categories ?? affectCategory),
+  ]);
+  const cached = drifts.get(key);
 
-  if (!(length > 0) || !(driftRadius > 0)) return { loops: 0, radius: 0 };
+  if (cached) return cached;
 
-  const loops = Math.max(1, Math.round(length / (LOOP * driftRadius)));
+  const route: RouteShape = { ...options, shape: 'drift', start, target };
+  const goal = isoChange(start, target, options);
+  const widest =
+    settings.driftRadius > 0 ? loopChange(route, settings.driftRadius) : 0;
+  let drift: Drift = { loops: 0, radius: 0, share: 1 };
 
-  return { loops, radius: length / (loops * LOOP) };
+  if (goal > 0 && widest > 0 && goal >= widest * MAX_DRIFT_LOOPS) {
+    drift = {
+      loops: MAX_DRIFT_LOOPS,
+      radius: settings.driftRadius,
+      share: (widest * MAX_DRIFT_LOOPS) / goal,
+    };
+  } else if (goal > 0 && widest > 0) {
+    const loops = Math.max(1, Math.ceil(goal / widest - 1e-9));
+    let lo = 0;
+    let hi = settings.driftRadius;
+
+    for (let i = 0; i < 24; i++) {
+      const mid = (lo + hi) / 2;
+
+      if (loops * loopChange(route, mid) < goal) lo = mid;
+      else hi = mid;
+    }
+
+    drift = { loops, radius: (lo + hi) / 2, share: 1 };
+  }
+
+  if (drifts.size > 500) drifts.clear();
+  drifts.set(key, drift);
+
+  return drift;
 }
 
 /**
@@ -200,16 +313,23 @@ export function pathPosition(
 ): AffectPoint {
   const u = progress(clamp01(t), shape, options);
 
+  return positionAt(u, start, target, shape, options);
+}
+
+/** Position at progress u (0..1) through a shape's movement. */
+function positionAt(
+  u: number,
+  start: AffectPoint,
+  target: AffectPoint,
+  shape: PathShape,
+  options: TransitionOptions,
+): AffectPoint {
   if (shape === 'direct') return target;
 
   if (shape === 'drift') {
     const { loops, radius } = driftLoops(start, target, options);
-    const angle = 2 * Math.PI * loops * u;
 
-    return {
-      arousal: target.arousal + radius * Math.sin(angle) * Math.cos(angle),
-      valence: target.valence + radius * Math.sin(angle),
-    };
+    return loopPoint(target, radius, 2 * Math.PI * loops * u);
   }
 
   if (shape === 'linear') {
@@ -361,7 +481,12 @@ function palettesOf(route: RouteShape): Palettes {
 
   const categories = route.categories ?? affectCategory;
   const ends = { ...route, coherence: 0 };
-  const origin = pathPosition(0, route.start, route.target, route.shape, route);
+  // drift and direct start where they end (and asking drift for its origin
+  // would recurse into its own calibration)
+  const origin =
+    route.shape === 'drift' || route.shape === 'direct'
+      ? route.target
+      : pathPosition(0, route.start, route.target, route.shape, route);
   const computed = {
     from: palette(mixAt(origin, ends), categories),
     to: palette(mixAt(route.target, ends), categories),

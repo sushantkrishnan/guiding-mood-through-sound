@@ -254,6 +254,7 @@ def session_rows(logs):
             "target_source": (log.get("route") or {}).get("toSource", "participant"),
             "close_start_target": flags.get("closeStartTarget"),
             "target_gap": flags.get("targetGap"),
+            "drift_share": ((log.get("route") or {}).get("drift") or {}).get("share"),
             "hours_since_previous": (
                 round(flags["sincePreviousMs"] / 3_600_000, 2)
                 if flags.get("sincePreviousMs") is not None
@@ -393,6 +394,9 @@ def summarise(sessions, probes, curves, ratings):
         issues.append(f"{len(early)} session(s) ended early: " + ", ".join(f"{r['participant']} s{r['session']}" for r in early))
     if close:
         issues.append(f"{len(close)} session(s) had start and target too close to separate the conditions: " + ", ".join(f"{r['participant']} s{r['session']}" for r in close))
+    short_drift = [r for r in sessions if r["drift_share"] is not None and r["drift_share"] < 0.95]
+    if short_drift:
+        issues.append(f"{len(short_drift)} drift session(s) changed the mix less than iso would have (target in a sparse region): " + ", ".join(f"{r['participant']} s{r['session']} ({r['drift_share']:.0%})" for r in short_drift))
     if sparse:
         issues.append(f"{len(sparse)} session(s) aimed at a sparse part of the map (target gap > 0.4)")
     if same_day:

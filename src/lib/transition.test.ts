@@ -1,12 +1,12 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { affect, cellToPoint, distance, fitToPool } from './affect';
-import { buildSchedule, planSamples } from './route';
+import { buildSchedule, planSamples, routeStats } from './route';
 import {
   ENGINE_DEFAULTS,
   driftLoops,
   frameAt,
-  isoLength,
+  MAX_DRIFT_LOOPS,
   matchedStart,
   mixAt,
   pathPosition,
@@ -53,23 +53,35 @@ describe('pathPosition', () => {
     expect(matchedStart(tense, { matchValenceFloor: -1 })).toEqual(tense);
   });
 
-  it('keeps drift near the target and matches iso path length', () => {
-    const steps = 20_000;
-    let length = 0;
+  it('keeps drift near the target and changes the mix as much as iso', () => {
+    const { loops, radius } = driftLoops(tense, calm);
     let furthest = 0;
-    let previous = pathPosition(0, tense, calm, 'drift');
 
-    for (let i = 1; i <= steps; i++) {
-      const point = pathPosition(i / steps, tense, calm, 'drift');
-      length += distance(point, previous);
+    for (let i = 0; i <= 2000; i++) {
+      const point = pathPosition(i / 2000, tense, calm, 'drift');
       furthest = Math.max(furthest, distance(point, calm));
-      previous = point;
     }
 
-    const { radius } = driftLoops(tense, calm);
-    expect(length).toBeCloseTo(isoLength(tense, calm), 2);
+    expect(loops).toBeGreaterThanOrEqual(1);
+    expect(loops).toBeLessThanOrEqual(MAX_DRIFT_LOOPS);
     expect(furthest).toBeLessThanOrEqual(radius + 1e-9);
-    expect(radius).toBeLessThan(ENGINE_DEFAULTS.driftRadius * 1.5);
+    expect(radius).toBeLessThanOrEqual(ENGINE_DEFAULTS.driftRadius);
+
+    const change = (shape: PathShape) =>
+      routeStats(
+        buildSchedule(
+          planSamples({ duration: 600_000, shape, start: tense, target: calm }),
+          600_000,
+        ),
+        calm,
+      ).change;
+
+    expect(change('drift') / change('iso')).toBeGreaterThan(0.9);
+    expect(change('drift') / change('iso')).toBeLessThan(1.1);
+  });
+
+  it('does not drift when there is nowhere to go', () => {
+    expect(driftLoops(calm, calm)).toEqual({ loops: 0, radius: 0, share: 1 });
   });
 });
 
