@@ -1,0 +1,122 @@
+.wrapper {
+  width: 100%;
+  max-width: 420px;
+  margin: 0 auto;
+  user-select: none;
+}
+
+.edge {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 0;
+  font-size: var(--font-xsm);
+  color: var(--color-foreground-subtler);
+
+  & .axis {
+    font-weight: 500;
+    color: var(--color-foreground-subtle);
+  }
+}
+
+.middle {
+  display: flex;
+  column-gap: 6px;
+  align-items: stretch;
+}
+
+.side {
+  font-size: var(--font-xsm);
+  font-weight: 500;
+  color: var(--color-foreground-subtle);
+  text-align: center;
+  writing-mode: vertical-rl;
+
+  &.left {
+    transform: rotate(180deg);
+  }
+}
+
+.board {
+  position: relative;
+  flex-grow: 1;
+  aspect-ratio: 1;
+}
+
+.grid {
+  display: grid;
+  grid-template-rows: repeat(9, 1fr);
+  grid-template-columns: repeat(9, 1fr);
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  border: 1px solid var(--color-neutral-300);
+  border-radius: 6px;
+}
+
+.cell {
+  position: relative;
+  padding: 0;
+  cursor: pointer;
+  background-color: var(--color-neutral-50);
+  border: none;
+  border-right: 1px solid var(--color-neutral-200);
+  border-bottom: 1px solid var(--color-neutral-200);
+  outline: none;
+  transition: background-color 120ms ease;
+
+  &:nth-child(9n) {
+    border-right: none;
+  }
+
+  &:nth-last-child(-n + 9) {
+    border-bottom: none;
+  }
+
+  &.midColumn {
+    background-color: var(--color-neutral-100);
+  }
+
+  &.midRow {
+    background-color: var(--color-neutral-100);
+  }
+
+  &:hover {
+    background-color: var(--color-neutral-200);
+  }
+
+  &:focus-visible {
+    z-index: 1;
+    outline: 2px solid var(--color-neutral-600);
+    outline-offset: -2px;
+  }
+
+  &.checked::after {
+    position: absolute;
+    inset: 22%;
+    content: '';
+    background-color: var(--color-foreground);
+    border-radius: 50%;
+  }
+}
+
+.readOnly .cell {
+  cursor: default;
+
+  &:hover {
+    background-color: var(--color-neutral-50);
+  }
+
+  &.midColumn:hover,
+  &.midRow:hover {
+    background-color: var(--color-neutral-100);
+  }
+}
+
+.overlay {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}

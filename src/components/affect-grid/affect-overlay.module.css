@@ -1,0 +1,75 @@
+.sound {
+  fill: var(--color-neutral-400);
+}
+
+.onPath {
+  fill: var(--color-neutral-600);
+}
+
+.highlight {
+  /* categorical slot 3 (aqua): validated all-pairs with the route's blue and
+     the participant reports' orange on the dark surface */
+  fill: #199e70;
+}
+
+.audible {
+  fill: var(--color-foreground);
+}
+
+/* faint preview, used where the path is context rather than the subject */
+.path {
+  fill: none;
+  stroke: var(--color-neutral-600);
+  stroke-dasharray: 4 3;
+  stroke-width: 1.5px;
+}
+
+/* the path as the chart's main series (visualiser) */
+.route {
+  fill: none;
+  stroke: #3987e5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 2px;
+}
+
+.reportLine {
+  fill: none;
+  stroke: #d95926;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.5px;
+}
+
+.report {
+  fill: #d95926;
+  stroke: var(--color-neutral-50);
+  stroke-width: 2px;
+}
+
+.start {
+  fill: none;
+  stroke: var(--color-foreground);
+  stroke-width: 2px;
+}
+
+.target {
+  fill: var(--color-foreground);
+}
+
+.label {
+  font-family: var(--font-body);
+  font-size: 0.3px;
+  fill: var(--color-foreground);
+  paint-order: stroke;
+  stroke: var(--color-neutral-50);
+  /* grid units: about 3px at the usual map size */
+  stroke-width: 0.08px;
+  stroke-linejoin: round;
+}
+
+.position {
+  fill: #3987e5;
+  stroke: var(--color-neutral-50);
+  stroke-width: 2px;
+}
