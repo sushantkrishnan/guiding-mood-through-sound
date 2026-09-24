@@ -21,6 +21,7 @@ import {
   BinauralItem,
   IsochronicItem,
   LofiItem,
+  TransitionItem,
 } from './items';
 import { Divider } from './divider';
 import { ShareLinkModal } from '@/components/modals/share-link';
@@ -32,6 +33,7 @@ import { BreathingExerciseModal } from '@/components/modals/breathing';
 import { BinauralModal } from '@/components/modals/binaural';
 import { IsochronicModal } from '@/components/modals/isochronic';
 import { LofiModal } from '@/components/modals/lofi';
+import { TransitionModal } from '@/components/modals/transition';
 import { Pomodoro, Notepad, Todo, Countdown } from '@/components/toolbox';
 
 import { fade, mix, slideY } from '@/lib/motion';
@@ -61,6 +63,7 @@ export function Menu() {
       shortcuts: false,
       sleepTimer: false,
       todo: false,
+      transition: false,
     }),
     [],
   );
@@ -94,6 +97,7 @@ export function Menu() {
   useHotkeys('shift+g', () => open('settings'));
   useHotkeys('shift+s', () => open('shareLink'), { enabled: !noSelected });
   useHotkeys('shift+alt+t', () => open('sleepTimer'));
+  useHotkeys('shift+alt+m', () => open('transition'));
 
   useCloseListener(closeAll);
 
@@ -130,6 +134,7 @@ export function Menu() {
                     initial="hidden"
                     variants={variants}
                   >
+                    <TransitionItem open={() => open('transition')} />
                     <PresetsItem open={() => open('presets')} />
                     <ShareItem open={() => open('shareLink')} />
                     <ShuffleItem />
@@ -194,6 +199,10 @@ export function Menu() {
         onClose={() => close('isochronic')}
       />
       <LofiModal show={modals.lofi} onClose={() => close('lofi')} />
+      <TransitionModal
+        show={modals.transition}
+        onClose={() => close('transition')}
+      />
     </>
   );
 }

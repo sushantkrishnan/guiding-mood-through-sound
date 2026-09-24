@@ -1,0 +1,114 @@
+.legend {
+  display: block;
+  margin-bottom: 8px;
+  font-size: var(--font-xsm);
+  font-weight: 500;
+}
+
+.shapes {
+  display: flex;
+  flex-direction: column;
+  row-gap: 8px;
+  padding: 0;
+  margin: 0 0 16px;
+  border: none;
+}
+
+.shape {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  column-gap: 10px;
+  align-items: center;
+  padding: 10px 12px;
+  cursor: pointer;
+  border: 1px solid var(--color-neutral-200);
+  border-radius: 8px;
+  transition: border-color 150ms ease;
+
+  &:hover {
+    border-color: var(--color-neutral-300);
+  }
+
+  &.active {
+    border-color: var(--color-neutral-500);
+  }
+
+  &:has(.radio:focus-visible) {
+    outline: 2px solid var(--color-neutral-400);
+    outline-offset: 2px;
+  }
+
+  & .radio {
+    grid-row: span 2;
+    accent-color: var(--color-foreground);
+  }
+
+  & .shapeLabel {
+    font-size: var(--font-sm);
+    font-weight: 500;
+  }
+
+  & .shapeDescription {
+    font-size: var(--font-xsm);
+    color: var(--color-foreground-subtle);
+  }
+}
+
+.duration {
+  display: block;
+  margin-bottom: 16px;
+}
+
+.select {
+  width: 100%;
+  height: 40px;
+  padding: 0 8px;
+  color: var(--color-foreground);
+  background-color: var(--color-neutral-50);
+  border: 1px solid var(--color-neutral-200);
+  border-radius: 4px;
+  outline: none;
+
+  &:focus-visible {
+    outline: 2px solid var(--color-neutral-400);
+    outline-offset: 2px;
+  }
+}
+
+.preview {
+  margin-top: 8px;
+}
+
+.note {
+  margin-top: 12px;
+  font-size: var(--font-xsm);
+  line-height: 1.5;
+  color: var(--color-foreground-subtle);
+  text-align: center;
+}
+
+.progress {
+  display: flex;
+  column-gap: 12px;
+  align-items: center;
+  margin-top: 16px;
+
+  & .bar {
+    flex-grow: 1;
+    height: 6px;
+    overflow: hidden;
+    background-color: var(--color-neutral-200);
+    border-radius: 3px;
+  }
+
+  & .fill {
+    height: 100%;
+    background-color: var(--color-foreground);
+  }
+
+  & .clock {
+    font-size: var(--font-sm);
+    font-variant-numeric: tabular-nums;
+    color: var(--color-foreground-subtle);
+  }
+}
