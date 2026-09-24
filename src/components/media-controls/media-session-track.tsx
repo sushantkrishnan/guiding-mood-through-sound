@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef } from 'react';
 
 import { BrowserDetect } from '@/helpers/browser-detect';
+import { getAssetPath } from '@/helpers/path';
 
 import { useSoundStore } from '@/stores/sound';
 
@@ -19,7 +20,9 @@ export function MediaSessionTrack() {
   const play = useSoundStore(state => state.play);
   const pause = useSoundStore(state => state.pause);
   const masterAudioSoundRef = useRef<HTMLAudioElement>(null);
-  const artworkURL = isDarkTheme ? '/logo-dark.png' : '/logo-light.png';
+  const artworkURL = getAssetPath(
+    isDarkTheme ? '/logo-dark.png' : '/logo-light.png',
+  );
 
   useEffect(() => {
     if (!isBrowser || !isPlaying) return;
@@ -92,7 +95,7 @@ export function MediaSessionTrack() {
       id="media-session-track"
       loop
       ref={masterAudioSoundRef}
-      src="/sounds/silence.wav"
+      src={getAssetPath('/sounds/silence.wav')}
     />
   );
 }

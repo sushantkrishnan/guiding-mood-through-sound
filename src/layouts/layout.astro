@@ -4,6 +4,7 @@ import { pwaInfo } from 'virtual:pwa-info'; // eslint-disable-line
 import { Reload } from '@/components/reload';
 
 import { count } from '@/lib/sounds';
+import { getAssetPath } from '@/helpers/path';
 
 import '@/styles/global.css';
 
@@ -25,7 +26,7 @@ const description =
     <meta content="width=device-width" name="viewport" />
     <meta content={Astro.generator} name="generator" />
     <meta content="#18181b" name="theme-color" />
-    <link href="/favicon.svg" rel="icon" type="image/svg+xml" />
+    <link href={getAssetPath('/favicon.svg')} rel="icon" type="image/svg+xml" />
 
     <title>{title}</title>
     <meta content={title} name="title" />

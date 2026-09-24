@@ -19,3 +19,18 @@ pnpm-debug.log*
 
 # macOS-specific files
 .DS_Store
+
+# third-party sound libraries (scripts/libraries/build.py): licences vary, some
+# non-commercial or unstated, so they are published deliberately, never committed
+.cache/
+public/libraries/
+
+# research docs: the papers and the figures extracted from them are
+# copyrighted, and the rendered PDFs and audio are large and regenerable
+docs/**/*.pdf
+docs/**/*.mp3
+docs/transitions.html
+docs/lit-review/figures/
+
+# python bytecode (scripts/)
+__pycache__/

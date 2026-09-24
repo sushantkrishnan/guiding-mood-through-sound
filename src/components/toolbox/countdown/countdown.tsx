@@ -12,6 +12,7 @@ import {
 import { useSoundEffect } from '@/hooks/use-sound-effect';
 import { useSettingsStore } from '@/stores/settings';
 import { padNumber } from '@/helpers/number';
+import { getAssetPath } from '@/helpers/path';
 
 import styles from './countdown.module.css';
 
@@ -30,7 +31,7 @@ export function Countdown({ onClose, show }: CountdownProps) {
   const [isFormVisible, setIsFormVisible] = useState(true);
   const alarmVolume = useSettingsStore(state => state.alarmVolume);
 
-  const alarm = useSoundEffect('/sounds/alarm.mp3', alarmVolume);
+  const alarm = useSoundEffect(getAssetPath('/sounds/alarm.mp3'), alarmVolume);
 
   useEffect(() => {
     let timer: NodeJS.Timeout;
