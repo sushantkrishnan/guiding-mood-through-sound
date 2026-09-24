@@ -17,7 +17,7 @@ import {
 import { Timeline, type Marker } from './timeline';
 import { LibraryPanel, type Usage } from './library-panel';
 
-import type { AffectPoint } from '@/lib/affect';
+import { fitToPool, type AffectPoint } from '@/lib/affect';
 import {
   buildSchedule,
   clock,
@@ -34,11 +34,17 @@ import {
   savedLogs,
   type SessionLog,
 } from '@/lib/study';
-import { ENGINE_DEFAULTS, type PathShape, type Route } from '@/lib/transition';
+import {
+  ENGINE_DEFAULTS,
+  type EngineSettings as Engine,
+  type PathShape,
+  type Route,
+} from '@/lib/transition';
 import {
   loadLibraries,
   moodist,
   MOODIST_ID,
+  categoriesOf,
   ownerIndex,
   poolOf,
   type Library,
@@ -55,6 +61,7 @@ import styles from './visualiser.module.css';
 const SHAPES: Array<{ id: PathShape; label: string }> = [
   { id: 'iso', label: 'Guided (iso)' },
   { id: 'linear', label: 'Linear' },
+  { id: 'drift', label: 'Drift' },
   { id: 'direct', label: 'Direct' },
 ];
 
@@ -62,8 +69,6 @@ const SPEEDS = [1, 10, 30, 60];
 
 /** points drawn for the route line on the map */
 const TRAIL_POINTS = 300;
-
-type Engine = typeof ENGINE_DEFAULTS;
 
 const conditionLabel = (id: string) =>
   CONDITIONS.find(c => c.id === id)?.label ?? id;
@@ -107,6 +112,7 @@ function Workbench() {
   const [shape, setShape] = useState<PathShape>('iso');
   const [minutes, setMinutes] = useState(10);
   const [engine, setEngine] = useState<Engine>(ENGINE_DEFAULTS);
+  const [fit, setFit] = useState(true);
 
   const [log, setLog] = useState<SessionLog | null>(null);
   const [logError, setLogError] = useState<string | null>(null);
@@ -147,6 +153,7 @@ function Workbench() {
     [libraries, enabledLibraries],
   );
   const owners = useMemo(() => ownerIndex(libraries), [libraries]);
+  const categories = useMemo(() => categoriesOf(libraries), [libraries]);
 
   // the regular app is underneath (it plays the audio); keep it out of the way
   useEffect(() => {
@@ -162,17 +169,21 @@ function Workbench() {
     };
   }, [setActive]);
 
-  const route = useMemo<Route>(
-    () => ({
+  const route = useMemo<Route>(() => {
+    // the same fitting study sessions use: the grid onto what the pool covers
+    const place = (cell: GridCell) =>
+      fit ? fitToPool(cellToPoint(cell), pool) : cellToPoint(cell);
+
+    return {
       ...engine,
+      categories,
       duration: Math.max(0.1, minutes) * 60_000,
       pool,
       shape,
-      start: cellToPoint(start),
-      target: cellToPoint(target),
-    }),
-    [engine, minutes, pool, shape, start, target],
-  );
+      start: place(start),
+      target: place(target),
+    };
+  }, [engine, categories, fit, minutes, pool, shape, start, target]);
 
   // planning a 10-minute route is ~12k engine frames; don't block typing
   const planned = useDeferredValue(route);
@@ -223,8 +234,11 @@ function Workbench() {
   const playingNow = useMemo(() => nowPlaying(schedule, now), [schedule, now]);
   const next = useMemo(() => upNext(schedule, now), [schedule, now]);
   const stats = useMemo(
-    () => routeStats(schedule, view.target),
-    [schedule, view.target],
+    () =>
+      routeStats(schedule, view.target, {
+        rampIn: log ? log.config.engine.rampIn : planned.rampIn,
+      }),
+    [schedule, view.target, log, planned.rampIn],
   );
   const live = useMemo(
     () => new Set(playingNow.map(p => p.lane.id)),
@@ -552,6 +566,15 @@ function Workbench() {
             </div>
 
             <label className={styles.inline}>
+              <input
+                checked={fit}
+                type="checkbox"
+                onChange={e => setFit(e.target.checked)}
+              />
+              Fit grid to the map
+            </label>
+
+            <label className={styles.inline}>
               Duration
               <input
                 max={60}
@@ -685,6 +708,12 @@ function Workbench() {
               <div>
                 <dt>Time at target</dt>
                 <dd>{clock(stats.targetExposure)}</dd>
+              </div>
+              <div>
+                <dt>Mix change</dt>
+                <dd title="Summed gain change per minute, after the ramp-in">
+                  {stats.change.toFixed(2)}/min
+                </dd>
               </div>
             </dl>
           </section>
@@ -900,9 +929,25 @@ const SETTINGS: Array<{
     step: 0.05,
   },
   {
-    hint: 'guided only',
+    hint: 'near-ties share the mix above this',
+    key: 'crowd',
+    label: 'Crowd',
+    max: 0.99,
+    min: 0.5,
+    step: 0.01,
+  },
+  {
+    hint: '0 = mood only; higher keeps one scene',
+    key: 'coherence',
+    label: 'Scene coherence',
+    max: 4,
+    min: 0,
+    step: 0.25,
+  },
+  {
+    hint: 'iso at start, drift at target',
     key: 'matchHold',
-    label: 'Hold at start',
+    label: 'Hold',
     max: 0.8,
     min: 0,
     scale: 100,
@@ -910,7 +955,33 @@ const SETTINGS: Array<{
     unit: '%',
   },
   {
-    hint: 'loudest sound',
+    hint: 'at the target, moving paths',
+    key: 'dwell',
+    label: 'Dwell',
+    max: 0.8,
+    min: 0,
+    scale: 100,
+    step: 0.05,
+    unit: '%',
+  },
+  {
+    hint: 'iso never starts below this; -1 = off',
+    key: 'matchValenceFloor',
+    label: 'Match valence floor',
+    max: 1,
+    min: -1,
+    step: 0.05,
+  },
+  {
+    hint: 'loop size around the target',
+    key: 'driftRadius',
+    label: 'Drift radius',
+    max: 0.5,
+    min: 0.05,
+    step: 0.01,
+  },
+  {
+    hint: 'whole mix, constant power',
     key: 'masterGain',
     label: 'Master gain',
     max: 1,

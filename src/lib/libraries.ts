@@ -11,7 +11,12 @@
  * can never collide with Moodist's.
  */
 
-import { affect, type AffectMap, type AffectPoint } from './affect';
+import {
+  affect,
+  affectCategory,
+  type AffectMap,
+  type AffectPoint,
+} from './affect';
 import { getAssetPath } from '@/helpers/path';
 import { registerSounds } from './sounds';
 import { sounds as moodistSounds } from '@/data/sounds';
@@ -155,6 +160,27 @@ export function poolOf(
     });
 
   return pool;
+}
+
+/**
+ * Scene label per sound id for the engine's `coherence`: Moodist's own
+ * categories, and each added library's categories kept apart from Moodist's
+ * (their names are not a shared vocabulary).
+ */
+export function categoriesOf(libraries: Array<Library>) {
+  const categories: Record<string, string> = { ...affectCategory };
+
+  libraries
+    .filter(library => !library.builtIn)
+    .forEach(library => {
+      library.sounds.forEach(sound => {
+        categories[sound.id] = sound.category
+          ? `${library.id}/${sound.category}`
+          : library.id;
+      });
+    });
+
+  return categories;
 }
 
 /** Which library owns each sound id, across the given libraries. */

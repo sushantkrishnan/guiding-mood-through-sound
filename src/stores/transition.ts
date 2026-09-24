@@ -94,12 +94,7 @@ export const useTransitionStore = create<TransitionStore>()((set, get) => ({
     get().cancel();
 
     const run = ++token;
-    const ids = trajectorySounds(
-      config.start,
-      config.target,
-      config.shape,
-      config,
-    );
+    const ids = trajectorySounds(config);
 
     const sound = useSoundStore.getState();
     sound.prepareMix(ids);

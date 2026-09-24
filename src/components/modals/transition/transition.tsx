@@ -14,6 +14,7 @@ import {
   cellToPoint,
   type GridCell,
 } from '@/components/affect-grid';
+import { fitToPool } from '@/lib/affect';
 import { trajectorySounds, type PathShape } from '@/lib/transition';
 import { getSoundLabel } from '@/lib/sounds';
 import { useTransitionStore } from '@/stores/transition';
@@ -31,7 +32,7 @@ type Step = 'now' | 'target' | 'path';
 const shapes: Array<{ description: string; id: PathShape; label: string }> = [
   {
     description:
-      'Starts where you are, eases your energy first, then your mood.',
+      'Meets your energy where it is, eases it, then lifts your mood.',
     id: 'iso',
     label: 'Guided',
   },
@@ -68,11 +69,18 @@ function Planner({ onStarted }: { onStarted: () => void }) {
   const [shape, setShape] = useState<PathShape>('iso');
   const [minutes, setMinutes] = useState(3);
 
-  const start = useMemo(() => (now ? cellToPoint(now) : null), [now]);
-  const end = useMemo(() => (target ? cellToPoint(target) : null), [target]);
+  // the grid runs to ±1 but the sounds do not; aim for what the map can play
+  const start = useMemo(
+    () => (now ? fitToPool(cellToPoint(now)) : null),
+    [now],
+  );
+  const end = useMemo(
+    () => (target ? fitToPool(cellToPoint(target)) : null),
+    [target],
+  );
 
   const onPath = useMemo(
-    () => (start && end ? trajectorySounds(start, end, shape) : []),
+    () => (start && end ? trajectorySounds({ shape, start, target: end }) : []),
     [start, end, shape],
   );
 

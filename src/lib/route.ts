@@ -66,7 +66,7 @@ export interface Schedule {
 
 /** Sample a planned route at the engine's own tick rate. */
 export function planSamples(route: Route): Array<Sample> {
-  const ids = trajectorySounds(route.start, route.target, route.shape, route);
+  const ids = trajectorySounds(route);
   // 20Hz like the engine, thinned only for very long routes
   const step = Math.max(50, route.duration / 12_000);
   const samples: Array<Sample> = [];
@@ -232,6 +232,11 @@ export interface RouteStats {
   abrupt: number;
   /** ms at which the position first comes within `radius` of the target */
   arrivesAt: number | null;
+  /**
+   * How much the mix changes: summed absolute gain change per minute, after
+   * the ramp-in. Lets `drift` be checked against the route it controls for.
+   */
+  change: number;
   sounds: number;
   /** ms spent within `radius` of the target */
   targetExposure: number;
@@ -240,11 +245,26 @@ export interface RouteStats {
 export function routeStats(
   schedule: Schedule,
   target: AffectPoint | null,
-  radius = 0.1,
+  { radius = 0.1, rampIn = ENGINE_DEFAULTS.rampIn } = {},
 ): RouteStats {
   let arrivesAt: number | null = null;
   let targetExposure = 0;
+  let change = 0;
   const { samples } = schedule;
+
+  samples.forEach((sample, i) => {
+    const previous = samples[i - 1];
+
+    if (!previous || sample.t <= rampIn) return;
+
+    new Set([...Object.keys(sample.mix), ...Object.keys(previous.mix)]).forEach(
+      id => {
+        change += Math.abs((sample.mix[id] ?? 0) - (previous.mix[id] ?? 0));
+      },
+    );
+  });
+
+  const minutes = Math.max(schedule.duration - rampIn, 1) / 60_000;
 
   if (target) {
     samples.forEach((sample, i) => {
@@ -262,6 +282,7 @@ export function routeStats(
       0,
     ),
     arrivesAt,
+    change: change / minutes,
     sounds: schedule.lanes.length,
     targetExposure,
   };

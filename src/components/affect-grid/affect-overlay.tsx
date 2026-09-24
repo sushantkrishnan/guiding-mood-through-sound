@@ -2,7 +2,11 @@ import { useMemo } from 'react';
 
 import { affect, type AffectMap, type AffectPoint } from '@/lib/affect';
 import { getSoundLabel } from '@/lib/sounds';
-import { pathPosition, type PathShape } from '@/lib/transition';
+import {
+  pathPosition,
+  type PathShape,
+  type TransitionOptions,
+} from '@/lib/transition';
 
 import { gridX, gridY } from './affect-grid';
 
@@ -24,6 +28,8 @@ interface AffectOverlayProps {
   labels?: Array<string>;
   /** ids the path will touch, drawn slightly brighter than the rest */
   onPath?: Array<string>;
+  /** engine options the path is drawn with (hold, dwell, drift loops…) */
+  options?: TransitionOptions;
   /** the sounds to draw; Moodist's library when not given */
   pool?: AffectMap;
   position?: AffectPoint | null;
@@ -37,7 +43,8 @@ interface AffectOverlayProps {
   trail?: Array<AffectPoint>;
 }
 
-const PATH_SAMPLES = 60;
+// enough for drift's loops to read as loops
+const PATH_SAMPLES = 240;
 
 /** rough text metrics in grid units, for the 0.3-unit label size */
 const CHAR_WIDTH = 0.16;
@@ -74,6 +81,7 @@ export function AffectOverlay({
   highlight,
   labels = [],
   onPath = [],
+  options,
   pool = affect,
   position,
   reports = [],
@@ -92,10 +100,10 @@ export function AffectOverlay({
 
     return toPoints(
       Array.from({ length: PATH_SAMPLES + 1 }, (_, i) =>
-        pathPosition(i / PATH_SAMPLES, start, target, shape),
+        pathPosition(i / PATH_SAMPLES, start, target, shape, options),
       ),
     );
-  }, [trail, start, target, shape]);
+  }, [trail, start, target, shape, options]);
 
   // participants' labels always show; a sound label that would collide with
   // one (or with a louder sound's label) is dropped, never stacked
