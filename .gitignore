@@ -32,5 +32,8 @@ docs/**/*.mp3
 docs/transitions.html
 docs/lit-review/figures/
 
+# other groups' peer-review submissions: theirs to share, and ~260 MB
+docs/video peer review/
+
 # python bytecode (scripts/)
 __pycache__/
