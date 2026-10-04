@@ -35,6 +35,11 @@ const count = soundCount();
         </span>
         <span>{count} Sounds</span>
       </p>
+
+      <nav aria-label="Research tools" class="research">
+        <a href={getAssetPath('/?study')}>Run a study session</a>
+        <a href={getAssetPath('/?visualise')}>Route visualiser</a>
+      </nav>
     </div>
   </Container>
 </div>
@@ -159,6 +164,36 @@ const count = soundCount();
           transparent
         );
         transform: translateX(-50%);
+      }
+    }
+
+    /* the study harness and visualiser, which otherwise need the URL typed */
+    & .research {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      justify-content: center;
+      margin-top: 28px;
+
+      & a {
+        padding: 8px 14px;
+        font-size: var(--font-xsm);
+        font-weight: 500;
+        color: var(--color-foreground);
+        text-decoration: none;
+        border: 1px solid var(--color-neutral-200);
+        border-radius: 50px;
+        transition: 0.2s;
+
+        &:hover,
+        &:focus-visible {
+          background-color: var(--color-neutral-100);
+        }
+
+        &:focus-visible {
+          outline: 2px solid var(--color-neutral-400);
+          outline-offset: 2px;
+        }
       }
     }
   }

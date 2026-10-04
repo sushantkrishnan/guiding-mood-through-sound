@@ -42,6 +42,15 @@
   color: var(--color-foreground-subtler);
   text-transform: uppercase;
   letter-spacing: 0.06em;
+
+  & a {
+    color: var(--color-foreground-subtle);
+    text-underline-offset: 3px;
+
+    &:hover {
+      color: var(--color-foreground);
+    }
+  }
 }
 
 .title {

@@ -46,6 +46,7 @@ import {
   type Library,
 } from '@/lib/libraries';
 import * as libraryPlayer from '@/lib/library-player';
+import { getAssetPath } from '@/helpers/path';
 import { cn } from '@/helpers/styles';
 import { useMixStore } from '@/stores/mix';
 import { useSettingsStore } from '@/stores/settings';
@@ -499,7 +500,9 @@ function Workbench() {
       <div className={styles.page}>
         <header className={styles.header}>
           <div>
-            <p className={styles.eyebrow}>Researcher tool</p>
+            <p className={styles.eyebrow}>
+              <a href={getAssetPath('/')}>Moodist</a> / Researcher tool
+            </p>
             <h1 className={styles.title}>Route visualiser</h1>
             {log ? (
               <p className={styles.lead}>

@@ -15,6 +15,7 @@ import {
   type TargetSource,
 } from '@/lib/study';
 import { ENGINE_DEFAULTS } from '@/lib/transition';
+import { getAssetPath } from '@/helpers/path';
 import { useMixStore } from '@/stores/mix';
 import { useSettingsStore } from '@/stores/settings';
 import { useSoundStore } from '@/stores/sound';
@@ -198,7 +199,9 @@ export function Setup({ onStart }: SetupProps) {
 
   return (
     <div className={styles.page}>
-      <p className={styles.eyebrow}>Researcher setup</p>
+      <p className={styles.eyebrow}>
+        <a href={getAssetPath('/')}>Moodist</a> / Researcher setup
+      </p>
       <h1 className={styles.title}>Study session</h1>
       <p className={styles.lead}>
         Configure the session, then hand the device to the participant. They
