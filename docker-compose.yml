@@ -1,7 +1,8 @@
 version: '3.9'
 services:
   moodist:
-    image: ghcr.io/remvze/moodist
+    # build this fork from source; the upstream image lacks the study tools
+    build: .
     logging:
       options:
         max-size: 1g
