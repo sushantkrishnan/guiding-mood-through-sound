@@ -32,6 +32,30 @@ const description =
     <meta content={title} name="title" />
     <meta content={description} name="description" />
 
+    <script is:inline>
+      const themePreference = window.matchMedia('(prefers-color-scheme: light)');
+
+      try {
+        const savedTheme = localStorage.getItem('moodist-theme');
+        document.documentElement.dataset.theme =
+          savedTheme === 'light' || savedTheme === 'dark'
+            ? savedTheme
+            : themePreference.matches
+              ? 'light'
+              : 'dark';
+
+        themePreference.addEventListener('change', event => {
+          if (!localStorage.getItem('moodist-theme')) {
+            document.documentElement.dataset.theme = event.matches ? 'light' : 'dark';
+          }
+        });
+      } catch {
+        document.documentElement.dataset.theme = themePreference.matches
+          ? 'light'
+          : 'dark';
+      }
+    </script>
+
     <meta content={title} property="og:title" />
     <meta content={description} property="og:description" />
     <meta content="Moodist" property="og:site_name" />

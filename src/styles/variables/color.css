@@ -1,4 +1,6 @@
 :root {
+  color-scheme: dark;
+
   --color-neutral-50: #09090b;
   --color-neutral-100: #18181b;
   --color-neutral-200: #27272a;
@@ -15,4 +17,24 @@
   --color-foreground: var(--color-neutral-950);
   --color-foreground-subtle: var(--color-neutral-600);
   --color-foreground-subtler: var(--color-neutral-500);
+}
+
+:root[data-theme='light'] {
+  color-scheme: light;
+
+  --color-neutral-50: #f6f7f4;
+  --color-neutral-100: #ffffff;
+  --color-neutral-200: #e9eae6;
+  --color-neutral-300: #d5d7d2;
+  --color-neutral-400: #b8bcb7;
+  --color-neutral-500: #929690;
+  --color-neutral-600: #727771;
+  --color-neutral-700: #535852;
+  --color-neutral-800: #393e3a;
+  --color-neutral-900: #242a26;
+  --color-neutral-950: #151a16;
+
+  --color-foreground: #191d1a;
+  --color-foreground-subtle: #626962;
+  --color-foreground-subtler: #7b827c;
 }
