@@ -4,15 +4,15 @@ A fork of [Moodist](https://github.com/remvze/moodist), the open-source ambient 
 
 **Try it:** <https://sushantkrishnan.github.io/moodist-study/>. The [study harness](https://sushantkrishnan.github.io/moodist-study/?study) and the [route visualiser](https://sushantkrishnan.github.io/moodist-study/?visualise) are linked from the main page.
 
-## Team
+## Team Members
 
-- Gian ([@jee-yann](https://github.com/jee-yann))
-- Hayden ([@hsim385](https://github.com/hsim385))
-- Megha ([@mkoh446](https://github.com/mkoh446))
-- Nathan ([@nathantheron](https://github.com/nathantheron))
-- Peter ([@Xiayang-Peter](https://github.com/Xiayang-Peter))
-- Sushant Krishnan ([@sushantkrishnan](https://github.com/sushantkrishnan))
-- Zaki ([@Zaki243](https://github.com/Zaki243))
+- Gian ([@jee-yann](https://github.com/jee-yann)) - gian.alexavier@gmail.com
+- Hayden ([@hsim385](https://github.com/hsim385)) - hsim385@aucklanduni.ac.nz
+- Megha ([@mkoh446](https://github.com/mkoh446)) - mkoh446@aucklanduni.ac.nz
+- Nathan ([@nathantheron](https://github.com/nathantheron)) - nthe160@aucklanduni.ac.nz
+- Peter ([@Xiayang-Peter](https://github.com/Xiayang-Peter)) - yxia728@aucklanduni.ac.nz
+- Sushant Krishnan ([@sushantkrishnan](https://github.com/sushantkrishnan)) - sthi106@aucklanduni.ac.nz
+- Zaki ([@Zaki243](https://github.com/Zaki243)) - zabr254@aucklanduni.ac.nz
 
 ## What the fork adds
 
