@@ -1,6 +1,6 @@
 # Guiding mood through sound
 
-A fork of [Moodist](https://github.com/remvze/moodist), the open-source ambient sound mixer, built for an HCI study. It adds a soundscape that moves a listener gradually from the mood they report to the mood they choose, rather than playing the destination straight away, and the tools to run a study on whether that transition is experienced differently from arriving directly.
+A fork of [Moodist](https://github.com/remvze/moodist), the open-source ambient sound mixer, built for an HCI study. It adds a soundscape that gradually guides a listener from their reported mood toward a chosen mood, rather than playing only the destination. It also includes tools to study whether this gradual transition is experienced differently from arriving at the destination directly.
 
 **Try it:** <https://sushantkrishnan.github.io/moodist-study/>. The [study harness](https://sushantkrishnan.github.io/moodist-study/?study) and the [route visualiser](https://sushantkrishnan.github.io/moodist-study/?visualise) are linked from the main page.
 
