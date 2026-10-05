@@ -6,7 +6,13 @@ A fork of [Moodist](https://github.com/remvze/moodist), the open-source ambient 
 
 ## Team
 
-Gian, Hayden, Megha, Nathan, Peter, Sushant Krishnan and Zaki.
+- Gian ([@jee-yann](https://github.com/jee-yann))
+- Hayden ([@hsim385](https://github.com/hsim385))
+- Megha ([@mkoh446](https://github.com/mkoh446))
+- Nathan ([@nathantheron](https://github.com/nathantheron))
+- Peter ([@Xiayang-Peter](https://github.com/Xiayang-Peter))
+- Sushant Krishnan ([@sushantkrishnan](https://github.com/sushantkrishnan))
+- Zaki ([@Zaki243](https://github.com/Zaki243))
 
 ## What the fork adds
 
