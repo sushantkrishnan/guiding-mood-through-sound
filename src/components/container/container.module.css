@@ -10,4 +10,8 @@
   &.wide {
     max-width: 760px;
   }
+
+  &.extraWide {
+    max-width: 1100px;
+  }
 }

@@ -96,7 +96,7 @@ export function App() {
     <SnackbarProvider>
       <StoreConsumer>
         <MediaControls />
-        <Container>
+        <Container extraWide>
           <div id="app" />
           <Buttons />
           <Categories categories={allCategories} />

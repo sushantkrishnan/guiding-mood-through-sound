@@ -17,15 +17,12 @@ export function Category({
 }: CategoryProps) {
   return (
     <div className={styles.category} id={`category-${id}`}>
-      <div className={styles.iconContainer}>
-        <div className={styles.tail} />
+      <div className={styles.heading}>
         <div aria-hidden="true" className={styles.icon}>
           {icon}
         </div>
+        <h2 className={styles.title}>{title}</h2>
       </div>
-
-      <div className={styles.title}>{title}</div>
-
       <Sounds functional={functional} id={id} sounds={sounds} />
     </div>
   );

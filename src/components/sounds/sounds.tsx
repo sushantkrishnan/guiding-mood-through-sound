@@ -10,6 +10,8 @@ import styles from './sounds.module.css';
 
 import type { Sounds } from '@/data/types';
 
+const INITIAL_VISIBLE = 8;
+
 interface SoundsProps {
   functional: boolean;
   id: string;
@@ -74,8 +76,8 @@ export function Sounds({ functional, id, sounds }: SoundsProps) {
             key={sound.label}
             {...sound}
             functional={functional}
-            hidden={!showAll && index > 5}
-            ref={index === 6 ? firstNewSound : undefined}
+            hidden={!showAll && index >= INITIAL_VISIBLE}
+            ref={index === INITIAL_VISIBLE ? firstNewSound : undefined}
             selectHidden={selectHidden}
             unselectHidden={unselectHidden}
           />
@@ -87,7 +89,7 @@ export function Sounds({ functional, id, sounds }: SoundsProps) {
             .map((_, index) => <div key={index} />)}
       </div>
 
-      {sounds.length > 6 && (
+      {sounds.length > INITIAL_VISIBLE && (
         <button
           ref={showMoreButton}
           className={cn(

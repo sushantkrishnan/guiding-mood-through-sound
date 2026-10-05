@@ -28,7 +28,8 @@ const paragraphs = [
 <section class="about">
   <div class="effect"></div>
 
-  <Container tight>
+  <Container extraWide>
+    <div class="paragraphs">
     {
       paragraphs.map((paragraph, index) => (
         <div class="paragraph">
@@ -41,6 +42,7 @@ const paragraphs = [
         </div>
       ))
     }
+    </div>
 
     <button class="button" id="use-moodist"> Use Moodist</button>
   </Container>
@@ -60,6 +62,12 @@ const paragraphs = [
   .about {
     padding-top: 10px;
 
+    & .paragraphs {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      column-gap: 56px;
+    }
+
     & .effect {
       position: sticky;
       top: 0;
@@ -68,16 +76,12 @@ const paragraphs = [
     }
 
     & .paragraph {
-      padding: 30px 0;
-      background: linear-gradient(
-        transparent,
-        var(--color-neutral-50) 10%,
-        var(--color-neutral-50) 90%,
-        transparent
-      );
+      padding: 24px 0;
+      border-top: 1px solid var(--color-neutral-200);
 
-      &:last-of-type {
-        padding-bottom: 0;
+      &:nth-child(-n + 2) {
+        padding-top: 0;
+        border-top: 0;
       }
 
       & .counter {
@@ -151,6 +155,18 @@ const paragraphs = [
         outline: 2px solid var(--color-neutral-400);
         outline-offset: 2px;
       }
+    }
+  }
+
+  @media (max-width: 720px) {
+    .about .paragraphs {
+      grid-template-columns: 1fr;
+      column-gap: 0;
+    }
+
+    .about .paragraph:nth-child(2) {
+      padding-top: 24px;
+      border-top: 1px solid var(--color-neutral-200);
     }
   }
 </style>
