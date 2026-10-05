@@ -1,5 +1,5 @@
 ---
-import { BsSoundwave } from 'react-icons/bs/index';
+import { BsMoonStarsFill, BsSoundwave, BsSunFill } from 'react-icons/bs/index';
 
 import { Container } from './container';
 
@@ -13,6 +13,16 @@ const count = soundCount();
   <Container>
     <div class="wrapper">
       <div class="pattern"></div>
+      <button
+        aria-label="Switch to light theme"
+        class="theme-toggle"
+        data-theme-toggle
+        type="button"
+      >
+        <span aria-hidden="true" class="theme-icon theme-icon-sun"><BsSunFill /></span>
+        <span aria-hidden="true" class="theme-icon theme-icon-moon"><BsMoonStarsFill /></span>
+        <span data-theme-label>Light mode</span>
+      </button>
       <div class="logo-wrapper">
         <img
           alt="Faded Moodist Logo"
@@ -44,13 +54,50 @@ const count = soundCount();
   </Container>
 </div>
 
+<script>
+  const themeToggle = document.querySelector('[data-theme-toggle]');
+  const themeLabel = themeToggle?.querySelector('[data-theme-label]');
+
+  function syncThemeToggle() {
+    const isDark = document.documentElement.dataset.theme === 'dark';
+    const nextTheme = isDark ? 'light' : 'dark';
+
+    if (themeToggle) {
+      themeToggle.dataset.currentTheme = isDark ? 'dark' : 'light';
+      themeToggle.setAttribute('aria-label', `Switch to ${nextTheme} theme`);
+      themeToggle.title = `Switch to ${nextTheme} theme`;
+    }
+
+    if (themeLabel) {
+      themeLabel.textContent = isDark ? 'Light mode' : 'Dark mode';
+    }
+  }
+
+  themeToggle?.addEventListener('click', () => {
+    const nextTheme =
+      document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
+
+    document.documentElement.dataset.theme = nextTheme;
+
+    try {
+      localStorage.setItem('moodist-theme', nextTheme);
+    } catch {
+      // The selected theme still applies for this page load.
+    }
+
+    syncThemeToggle();
+  });
+
+  syncThemeToggle();
+</script>
+
 <style>
   .hero {
     text-align: center;
 
     .wrapper {
       position: relative;
-      padding: 120px 0 80px;
+      padding: 104px 0 72px;
 
       & .pattern {
         position: absolute;
@@ -97,6 +144,10 @@ const count = soundCount();
         animation-timing-function: linear;
         animation-iteration-count: infinite;
       }
+    }
+
+    :global(html[data-theme='light']) & .logo {
+      filter: invert(1);
     }
 
     & .title {
@@ -195,6 +246,59 @@ const count = soundCount();
           outline-offset: 2px;
         }
       }
+    }
+  }
+
+  .theme-toggle {
+    position: absolute;
+    top: 16px;
+    right: 0;
+    display: inline-flex;
+    gap: 8px;
+    align-items: center;
+    min-height: 36px;
+    padding: 0 12px;
+    color: var(--color-foreground);
+    background: var(--color-neutral-100);
+    border: 1px solid var(--color-neutral-200);
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: var(--font-xsm);
+    transition:
+      background-color 160ms ease,
+      border-color 160ms ease,
+      transform 160ms ease;
+
+    &:hover {
+      background: var(--color-neutral-200);
+      transform: translateY(-1px);
+    }
+
+    &:focus-visible {
+      outline: 2px solid var(--color-neutral-500);
+      outline-offset: 3px;
+    }
+
+    & .theme-icon {
+      display: inline-flex;
+      align-items: center;
+      font-size: 16px;
+    }
+
+    &[data-current-theme='dark'] .theme-icon-moon,
+    &[data-current-theme='light'] .theme-icon-sun {
+      display: none;
+    }
+  }
+
+  @media (max-width: 600px) {
+    .hero .wrapper {
+      padding-top: 88px;
+    }
+
+    .theme-toggle {
+      top: 12px;
+      right: 0;
     }
   }
 

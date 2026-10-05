@@ -30,6 +30,7 @@ const build = {
 
 export default defineConfig({
   base,
+  devToolbar: { enabled: false },
   // scripts/pages/publish.sh builds elsewhere so dist/ keeps serving locally
   outDir: process.env.OUT_DIR || './dist',
   vite: {

@@ -12,15 +12,26 @@ export function useDarkTheme() {
 
     const themeMediaQuery = window.matchMedia(themeMatch);
 
-    function handleThemeChange(event: MediaQueryListEvent) {
-      setIsDarkTheme(event.matches);
+    function syncTheme() {
+      const selectedTheme = document.documentElement.dataset.theme;
+      setIsDarkTheme(
+        selectedTheme ? selectedTheme === 'dark' : themeMediaQuery.matches,
+      );
     }
 
-    themeMediaQuery.addEventListener('change', handleThemeChange);
-    setIsDarkTheme(themeMediaQuery.matches);
+    const observer = new MutationObserver(syncTheme);
+    observer.observe(document.documentElement, {
+      attributeFilter: ['data-theme'],
+      attributes: true,
+    });
 
-    return () =>
-      themeMediaQuery.removeEventListener('change', handleThemeChange);
+    themeMediaQuery.addEventListener('change', syncTheme);
+    syncTheme();
+
+    return () => {
+      observer.disconnect();
+      themeMediaQuery.removeEventListener('change', syncTheme);
+    };
   }, [isBrowser]);
 
   return isDarkTheme;
