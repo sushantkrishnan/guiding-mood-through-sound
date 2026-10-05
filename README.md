@@ -23,7 +23,7 @@ A fork of [Moodist](https://github.com/remvze/moodist), the open-source ambient 
 | Mood Transition | toolbar menu, `src/components/modals/transition/` | The listener-facing feature: say how you feel, pick where you want to go, pick a path and a length. |
 | Study harness | `/?study`, `src/components/study/`, `src/lib/study.ts` | Researcher setup, counterbalanced conditions, Affect Grid pre/post and check-ins, mood curve, questionnaire, sound-rating block, JSON session logs. |
 | Route visualiser | `/?visualise`, `src/components/visualiser/` | Plan a route and see what the engine will play, when and how loud, or open a session log and replay what a participant heard. |
-| Analysis | `scripts/analysis/analyse.py` | Turns a folder of session logs into CSVs and a summary following the analysis plan. |
+| Analysis | `scripts/analysis/analyse.py` | Turns a folder of session logs into CSVs and a summary following the [analysis plan](docs/proposal-sections.md#44-evaluation-study-design) (§4.4). |
 | Study bot | `scripts/study-bot/run.mjs` | Synthetic participants run real sessions in headless Chrome, to test harness → logs → analysis before anyone sits down. |
 | Sound libraries | `scripts/libraries/build.py` | Optional third-party affective sound libraries, for comparing maps in the visualiser. |
 
