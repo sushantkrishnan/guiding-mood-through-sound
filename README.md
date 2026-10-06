@@ -64,7 +64,7 @@ All JavaScript dependencies are pinned in `package.json` and `pnpm-lock.yaml`; `
 
 1. Open the main page. The mixer is Moodist's: pick sounds, set volumes, press play.
 2. **Mood Transition** (toolbar menu, or Shift + Alt + M): choose how you feel now and where you want to be on the Affect Grid, then *Guided*, *Straight line* or *Direct*, and 1 to 10 minutes. The mix moves on its own; the mixer shows each sound's level as it changes.
-3. **Route visualiser** (button on the main page, or `/?visualise`): pick a start and target and a path shape to see every sound the route will play as a timeline, with the path drawn over the sound map. Press play to hear it.
+3. **Route visualiser** (button on the main page, or `/?visualise`): pick a start, target and path shape to see every sound the route will play as a timeline, with the path drawn over the sound map. Press play to hear it.
 4. **Study harness** (button on the main page, or `/?study`): the researcher setup screen. Enter a participant ID and start a short session to walk through what a participant sees. The log downloads at the end and can be opened in the visualiser.
 
 ## Running the study
