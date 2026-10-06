@@ -1,10 +1,12 @@
 import { describe, expect, it } from 'vitest';
 
 import {
+  DEFAULT_SETUP,
   firstTarget,
   orderFor,
   probeTimes,
   ratingSounds,
+  resolveTarget,
   sequencesFor,
   sincePrevious,
   targetExposure,
@@ -48,6 +50,13 @@ describe('williams', () => {
     expect(orderFor(1, conditions)).toEqual(orderFor(7, conditions));
     expect(orderFor(1, conditions)).not.toEqual(orderFor(2, conditions));
   });
+
+  // the protocol's facilitator instructions and debrief depend on this
+  it('gives odd participants guided first and even ones fixed first', () => {
+    expect(orderFor(1, DEFAULT_SETUP.conditions)).toEqual(['iso', 'direct']);
+    expect(orderFor(2, DEFAULT_SETUP.conditions)).toEqual(['direct', 'iso']);
+    expect(orderFor(3, DEFAULT_SETUP.conditions)).toEqual(['iso', 'direct']);
+  });
 });
 
 describe('probeTimes', () => {
@@ -64,6 +73,10 @@ describe('probeTimes', () => {
     expect(
       probeTimes({ checkIns: 'none', duration: 10, probeInterval: 2 }),
     ).toEqual([]);
+  });
+
+  it('checks in at 2 and 4 minutes with the default (protocol) setup', () => {
+    expect(probeTimes(DEFAULT_SETUP)).toEqual([120_000, 240_000]);
   });
 });
 
@@ -120,6 +133,44 @@ describe('earlier sessions', () => {
     expect(sincePrevious(logs, 'P01', 3, now)).toBe(3_600_000);
     expect(sincePrevious(logs, 'P01', 2, now)).toBe(7_200_000);
     expect(sincePrevious(logs, 'P09', 1, now)).toBeNull();
+  });
+});
+
+describe('resolveTarget', () => {
+  const calm = { arousal: 3, pleasure: 7 };
+  const chosen = fakeLog({
+    route: { to: { grid: { arousal: 2, pleasure: 8 } } } as SessionLog['route'],
+  });
+
+  it('uses the fixed cell in every session', () => {
+    [1, 2].forEach(session => {
+      expect(
+        resolveTarget(
+          { fixedTarget: calm, session, targetMode: 'fixed' },
+          [],
+          'P01',
+        ),
+      ).toEqual({ cell: calm, source: 'fixed' });
+    });
+  });
+
+  it('reuses the first session only after it, and leaves choosing open', () => {
+    const first = { fixedTarget: calm, targetMode: 'first' as const };
+
+    expect(resolveTarget({ ...first, session: 1 }, [chosen], 'P01')).toBeNull();
+    expect(resolveTarget({ ...first, session: 2 }, [chosen], 'P01')).toEqual({
+      cell: { arousal: 2, pleasure: 8 },
+      source: 'first-session',
+    });
+    // needed but not saved in this browser
+    expect(resolveTarget({ ...first, session: 2 }, [], 'P01')).toBeUndefined();
+    expect(
+      resolveTarget(
+        { fixedTarget: calm, session: 2, targetMode: 'choose' },
+        [chosen],
+        'P01',
+      ),
+    ).toBeNull();
   });
 });
 

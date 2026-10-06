@@ -10,6 +10,7 @@
     "test": "vitest run",
     "study:bot": "node scripts/study-bot/run.mjs",
     "study:analyse": "python3 scripts/analysis/analyse.py",
+    "study:protocol": "python3 scripts/analysis/protocol_analysis.py",
     "astro": "astro",
     "check": "biome check .",
     "check:fix": "biome check --write .",

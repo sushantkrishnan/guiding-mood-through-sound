@@ -153,26 +153,40 @@ export interface StudySetup {
   targetMode: TargetMode;
 }
 
+/**
+ * The settings in the study protocol
+ * (docs/Protocol_Guiding_Mood_Through_Sound.docx, section 3.1): two
+ * five-minute sessions, guided against fixed, both heading for the same
+ * calm cell, with check-ins every two minutes.
+ */
 export const DEFAULT_SETUP: StudySetup = {
-  checkIns: 'phases',
+  checkIns: 'interval',
   chime: true,
   conditions: ['iso', 'direct'],
   device: '',
-  duration: 10,
+  duration: 5,
   fitToMap: true,
   fixedTarget: { arousal: 3, pleasure: 7 },
   minDistance: 2,
-  moodCurve: true,
+  moodCurve: false,
   participantId: '',
   participantNumber: 1,
   probeInterval: 2,
   ratingBlock: true,
-  ratingCount: 20,
+  ratingCount: 12,
   ratingSeconds: 10,
   session: 1,
   startVolume: 0.8,
-  targetMode: 'first',
+  targetMode: 'fixed',
 };
+
+/**
+ * Listening ms a check-in stays open unanswered before it closes and is
+ * logged as missed. The protocol has the facilitator prompt once at about
+ * 30 s; without this, an open check-in would sit through the transition and
+ * be logged as a late answer.
+ */
+export const PROBE_TIMEOUT_MS = 45_000;
 
 /** When check-ins fall due, in listening ms. */
 export function probeTimes(
@@ -299,6 +313,8 @@ export interface SessionLog {
     fitToMap: boolean;
     /** the affect map the session used (see provenance.ts) */
     map: { hash: string; sounds: number };
+    /** listening ms an unanswered check-in stays open (absent in older logs) */
+    probeTimeoutMs?: number;
     /** listening ms each check-in fell due */
     probeTimesMs: Array<number>;
     tickRate: number;
@@ -325,7 +341,12 @@ export interface SessionLog {
     probes: Array<ProbeRecord>;
     questionnaire: Questionnaire | null;
     ratings: Array<SoundRating>;
-    /** the participant's own target answer; null when it was set for them */
+    /**
+     * The participant's answer to "How would you like to feel?". It is the
+     * route's target only when they choose it (`route.toSource` is
+     * `participant`); with a fixed target it is recorded alongside, and the
+     * route still goes to `route.to`. Null when not asked (`first` mode).
+     */
     target: GridAnswer | null;
   };
   order: Array<Condition>;
@@ -442,6 +463,7 @@ export function createLog(setup: StudySetup, order: Array<Condition>) {
       engine: { ...ENGINE_DEFAULTS },
       fitToMap: setup.fitToMap,
       map: { hash: mapHash(affect), sounds: Object.keys(affect).length },
+      probeTimeoutMs: PROBE_TIMEOUT_MS,
       probeTimesMs: probeTimes(setup),
       tickRate: 20,
       traceRate: 2,
@@ -503,6 +525,31 @@ export function firstTarget(
     .sort((a, b) => a.session - b.session)[0];
 
   return earliest?.cell ?? null;
+}
+
+/** A target the researcher's setup decides, rather than the participant. */
+export interface ResolvedTarget {
+  cell: GridCell;
+  source: Exclude<TargetSource, 'participant'>;
+}
+
+/**
+ * Where a session heads: a target set for the participant, null when they
+ * choose it, or undefined when `first` mode needs a first session that
+ * isn't saved in this browser.
+ */
+export function resolveTarget(
+  setup: Pick<StudySetup, 'fixedTarget' | 'session' | 'targetMode'>,
+  logs: Array<SessionLog>,
+  participantId: string,
+): ResolvedTarget | null | undefined {
+  if (setup.targetMode === 'fixed')
+    return { cell: setup.fixedTarget, source: 'fixed' };
+  if (setup.targetMode === 'choose' || setup.session <= 1) return null;
+
+  const cell = firstTarget(logs, participantId);
+
+  return cell ? { cell, source: 'first-session' } : undefined;
 }
 
 /** ms since this participant's most recent other session ended. */

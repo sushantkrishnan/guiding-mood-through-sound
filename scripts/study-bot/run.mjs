@@ -82,7 +82,7 @@ async function participant(browser, number) {
 }
 
 async function runSession(page, id, session, cell) {
-  {
+  if (session === 1) {
     await page.goto(`${BASE}?study`, { waitUntil: 'networkidle' });
     await page.getByLabel('Participant ID').fill(id);
     await page.getByLabel('Session', { exact: true }).fill(String(session));
@@ -103,7 +103,14 @@ async function runSession(page, id, session, cell) {
     await page
       .getByRole('button', { name: 'Start participant session' })
       .click();
+  } else {
+    // the protocol's path: the next session straight from the thank-you page
+    await page
+      .getByRole('button', { name: `Start session ${session} for ${id}` })
+      .click();
+  }
 
+  {
     // tense start, calm target: the task the study is built around
     const pre = [between(1, 4), between(6, 9)];
     await page.getByRole('button', { name: 'Begin' }).click();
