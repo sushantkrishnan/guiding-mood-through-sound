@@ -23,7 +23,7 @@ A fork of [Moodist](https://github.com/remvze/moodist), the open-source ambient 
 | Mood Transition | toolbar menu, `src/components/modals/transition/` | The listener-facing feature: say how you feel, pick where you want to go, pick a path and a length. |
 | Study harness | `/?study`, `src/components/study/`, `src/lib/study.ts` | Researcher setup, counterbalanced conditions, Affect Grid pre/post and check-ins, mood curve, questionnaire, sound-rating block, JSON session logs. |
 | Route visualiser | `/?visualise`, `src/components/visualiser/` | Plan a route and see what the engine will play, when and how loud, or open a session log and replay what a participant heard. |
-| Analysis | `scripts/analysis/analyse.py` | Turns a folder of session logs into CSVs and a summary following the [analysis plan](docs/proposal-sections.md#44-evaluation-study-design) (§4.4). |
+| Analysis | `scripts/analysis/protocol_analysis.py`, `scripts/analysis/analyse.py` | The study protocol's analysis (section 5): change in calmness, guided against fixed, and every secondary test, from a folder of session logs. `analyse.py` adds data-quality tables and the earlier [pilot plan](docs/proposal-sections.md#44-evaluation-study-design) (§4.4). |
 | Study bot | `scripts/study-bot/run.mjs` | Synthetic participants run real sessions in headless Chrome, to test harness → logs → analysis before anyone sits down. |
 | Sound libraries | `scripts/libraries/build.py` | Optional third-party affective sound libraries, for comparing maps in the visualiser. |
 
@@ -31,7 +31,7 @@ Everything else (the mixer, presets, timers, PWA) is upstream Moodist.
 
 ## Running it
 
-**Requirements:** Node 24 and pnpm 11. Python 3.9 or later (standard library only) for the analysis and library scripts. Google Chrome for the study bot.
+**Requirements:** Node 24 and pnpm 11. Python 3.9 or later for the scripts: the protocol analysis needs `pip install numpy scipy matplotlib`; the others use only the standard library. Google Chrome for the study bot.
 
 ```bash
 pnpm install
@@ -69,31 +69,32 @@ All JavaScript dependencies are pinned in `package.json` and `pnpm-lock.yaml`; `
 
 ## Running the study
 
-[`docs/study-harness.md`](docs/study-harness.md) is the full protocol: preparing the room and device, every setup option and its default, what participants see, what a log contains, and the decisions still open. In short:
+The study protocol, [`docs/Protocol_Guiding_Mood_Through_Sound.docx`](docs/Protocol_Guiding_Mood_Through_Sound.docx), is the authority: research question, measures, the facilitator's script, timings, consent materials and the analysis plan. [`docs/study-harness.md`](docs/study-harness.md) is the practical guide to the app: every setup option and its default, what participants see, what a log contains. The app's defaults are the protocol's settings. In short:
 
 1. Build and serve the site (`pnpm build && pnpm preview`, or the Pages deployment) and open `/?study`.
 2. Test the whole pipeline with the bot first:
 
    ```bash
    BASE_URL=http://localhost:4321/ pnpm study:bot     # with pnpm preview running
-   pnpm study:analyse .cache/bot-logs
+   pnpm study:protocol .cache/bot-logs
    ```
 
-3. For each session: same room, headphones and device; set the participant ID and session; play the calibration sound and set the device volume once; start and hand over the device.
-4. Copy each downloaded log (`moodist-P01-s1.json`) somewhere safe. A backup also stays in the browser.
-5. Analyse:
+3. For each participant: same room, headphones and device; enter the participant ID and number; play the calibration sound and set the device volume once; start and hand over the device. After Session 1 and the rest, press **Start session 2** on the thank-you screen.
+4. Copy each downloaded log (`moodist-P01-s1.json`, `-s2.json`) somewhere safe. A backup also stays in the browser.
+5. Analyse, excluding anyone the logs can't show should be excluded (withdrawals, dropouts the note-taker recorded):
 
    ```bash
-   pnpm study:analyse path/to/logs
+   pnpm study:protocol path/to/logs --exclude P07
    ```
 
-   This writes `analysis/` next to the logs: `sessions.csv`, `probes.csv`, `curves.csv`, `ratings.csv` and `summary.md`.
+   This writes `protocol/` next to the logs: `participants.csv`, `checkins.csv`, `results.md` and `trajectory.png`.
 
 ## Documentation
 
 | File | Contents |
 |---|---|
-| [`docs/study-harness.md`](docs/study-harness.md) | How to run sessions and analyse them (above). |
+| [`docs/Protocol_Guiding_Mood_Through_Sound.docx`](docs/Protocol_Guiding_Mood_Through_Sound.docx) | The study protocol: research question, measures, script, procedure, analysis plan, information sheet, consent form and observation sheet. |
+| [`docs/study-harness.md`](docs/study-harness.md) | How the study harness works: setup options, what participants see, the log format, the analysis scripts. |
 | [`docs/proposal-sections.md`](docs/proposal-sections.md) | Project scope, the method for mapping sounds, system overview and the evaluation design, with references. |
 | [`docs/proposal.html`](docs/proposal.html) | The proposal, *Path or Destination*. |
 | [`docs/affect-map.html`](docs/affect-map.html), `docs/affect-map.svg`, `docs/affect-data.json` | The sound map: every sound's valence/arousal position. |

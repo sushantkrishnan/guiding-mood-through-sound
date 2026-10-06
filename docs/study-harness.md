@@ -1,6 +1,6 @@
 # Study harness: how to run the pilot
 
-Written 25 Sep 2026, alongside the `pilot-prep` branch. This is the practical guide: what the harness does, how to run a session, what gets logged, and how to analyse it. The reasoning behind the design is in `proposal-sections.md`. Where the two disagree on engine details, this file is newer.
+Written 25 Sep 2026, alongside the `pilot-prep` branch; updated 6 Oct 2026 to match the study protocol (`Protocol_Guiding_Mood_Through_Sound.docx`), which is the authority on procedure and analysis. This is the practical guide: what the harness does, how to run a session, what gets logged, and how to analyse it. The reasoning behind the design is in `proposal-sections.md`. Where the two disagree on engine details, this file is newer.
 
 ## What changed and why, in one table
 
@@ -27,25 +27,28 @@ Written 25 Sep 2026, alongside the `pilot-prep` branch. This is the practical gu
 3. Play the calibration sound. Set the **device** volume so it is comfortable, then leave the device volume alone for the whole study.
 4. Start the session and hand over the device. The participant sees only their screens, never the condition.
 5. After the session the log downloads (`moodist-P01-s1.json`) and a backup stays in the browser (IndexedDB). Copy the download somewhere safe straight away.
-6. Run each participant's sessions on **separate days**. Setup warns if the previous session ended less than 12 hours ago.
+6. Both sessions run in one visit. After the Session 1 questionnaire and the 5-minute rest, press **Start session 2 for P01** on the thank-you screen: it keeps the setup and moves to the next session, so there is no second setup. (Back to setup still works; it shows how long ago the participant's previous session ended, so the session number can be checked.)
 
 ## Setup options (defaults in bold)
 
+The defaults are the protocol's settings (section 3.1), so a fresh browser needs only the participant ID and number. A browser remembers the last setup it ran, so check the values on a machine used for testing.
+
 | Option | Choices | Notes |
 |---|---|---|
-| Conditions | **Guided**, **Direct target**, Direct + drift, Unguided | Linear is not offered to participants any more; it stays in the visualiser. |
-| Target | **Same as their first session**, participant chooses, fixed | "Same as first" makes every session of a participant travel to the same place. It needs session 1 in the same browser; otherwise use Fixed and type the target in. Use Fixed with e.g. pleasantness 7, arousal 3 to test calming down only. |
-| Flag start/target closer than | **2 cells** | Closer than this and every condition sounds nearly the same. The session still runs; the log and summary flag it. |
+| Conditions | **Guided**, **Direct target**, Direct + drift, Unguided | Guided and Direct target are the protocol's guided and fixed conditions. Odd participant numbers hear guided first, even numbers fixed first. Linear is not offered to participants; it stays in the visualiser. |
+| Listening time | **5 minutes** | |
+| Target | same as their first session, participant chooses, **fixed: pleasantness 7, arousal 3** | Fixed is the protocol: every session heads for the same calm cell. Participants are still asked "How would you like to feel?"; the answer is logged (`measures.target`) but does not change the route. "Same as first" needs session 1 in the same browser. |
+| Flag start/target closer than | **2 cells** | Closer than this and every condition sounds nearly the same. The session still runs; the log flags it, and the analysis repeats H1 without those participants. |
 | Fit the grid to the sound map | **on** | See the table above. |
-| Check-ins | **halfway and on arrival**, every N minutes, none | Halfway through the movement and on arrival: 45% and 80% of the session, so 4:30 and 8:00 in a 10-minute session. The same times apply to every condition. |
+| Check-ins | halfway and on arrival, **every 2 minutes**, none | Every 2 minutes gives check-ins at 2:00 and 4:00 in a 5-minute session, the same times in every condition. A check-in left unanswered closes itself after 45 s of listening and is logged as missed (`probe-missed`); one that falls due while another is open is skipped. |
 | Chime | **on** | A soft two-note chime when a check-in appears, for eyes-closed listening. |
-| Mood curve | **on** | After the post rating, the participant draws how pleasant and how energised they felt over the session (after Kujala et al.'s UX Curve). Works by drag or keyboard. |
-| Rating block | **on**, **20 sounds**, **10 s** | Final session only. Plays the sounds this participant heard most, one at a time and unnamed, and asks how each makes them feel. Adds about 5 minutes. |
+| Mood curve | **off** | After the post rating, the participant draws how pleasant and how energised they felt over the session (after Kujala et al.'s UX Curve). Off in the protocol: the check-ins already give the trajectory. |
+| Rating block | **on**, **12 sounds**, **10 s** | Final session only. Plays the sounds this participant heard most, one at a time and unnamed, and asks how each makes them feel: the only data that tests the provisional sound map. Adds about 3 minutes. |
 | Starting volume | **80%** | Applied when listening starts, for every condition. |
 
 ## What the participant sees
 
-Welcome → how do you feel now → the target (chosen, with a faint ring showing "now", or shown read-only if it was set for them) → listening ("Just listen", no countdown, eyes may close) with check-ins → how do you feel now → mood curve → questionnaire → (final session) rating block → thank you.
+Welcome → how do you feel now → how would you like to feel (with a faint ring showing "now"; shown read-only instead when the target is "same as first session") → listening ("Just listen", no countdown, eyes may close) with check-ins → how do you feel now → (mood curve, if on) → questionnaire → (final session) rating block → thank you.
 
 Questionnaire items, in order: pleasant, one scene, **monotonous** (new), helped me move towards how I wanted to feel, **felt like it was going somewhere** (last: it is the manipulation check, not an outcome). Plus "did any moment sound wrong", and in the final session the preference question.
 
@@ -55,7 +58,7 @@ In the unguided condition the page shows only the mixer. Donation prompts, marke
 
 - `setup`: every option above, as run.
 - `route`: the grid answers it was built from (`from`, `to`, `toSource`) and the fitted engine points actually played (`start`, `target`).
-- `measures`: `pre`, `target` (the participant's own answer, or null if it was set for them), `probes`, `post`, `curve`, `questionnaire`, `ratings`.
+- `measures`: `pre`, `target` (the answer to "How would you like to feel?", recorded even when the target is fixed; null if not asked), `probes` (each with when it was due, shown and answered; unanswered ones have a null answer), `post`, `curve`, `questionnaire`, `ratings`.
 - `flags`: `closeStartTarget`, `targetGap` (distance between the target and the mix played there; above 0.4 means a sparse part of the map), `sincePreviousMs`.
 - `config`: engine settings, map fingerprint (`map.hash`), check-in times, trace rate.
 - `build`: git commit and whether the build had uncommitted changes.
@@ -68,29 +71,32 @@ A 10-minute log is about 250 KB (was 1.5 MB). The visualiser (`/?visualise`) ope
 
 ## Analysis
 
+The study's analysis is the protocol's (section 5), in `scripts/analysis/protocol_analysis.py`:
+
+```bash
+pip install numpy scipy matplotlib     # once
+pnpm study:protocol path/to/logs [--exclude P03,P07]
+```
+
+`--exclude` drops participants for reasons the logs can't show: withdrawal, or a dropout or app error the note-taker recorded. The script applies the other exclusion rules itself (both sessions, at least 80% listened, pre and post ratings, no sounds that failed to load) and writes `protocol/` next to the logs: `participants.csv`, `checkins.csv`, `results.md` and `trajectory.png`. The primary outcome is the change in calmness (valence − arousal on the −4..+4 grid), guided against fixed, by paired t-test, or Wilcoxon signed-rank when the paired differences are not normal. It also runs the baseline, order, valence/arousal, manipulation-check, monotony, secondary-item (Holm-corrected) and preference analyses, and repeats H1 without close start/target participants and in those who wanted to feel calm.
+
+A second, older summary is still available for data quality and the pilot's descriptive measures:
+
 ```bash
 pnpm study:analyse path/to/logs        # python3 scripts/analysis/analyse.py
 ```
 
-Writes `analysis/` next to the logs: `sessions.csv`, `probes.csv`, `curves.csv`, `ratings.csv` and `summary.md`. Standard-library Python, nothing to install. The summary follows the plan in proposal-sections §4.4:
-
-1. **Data quality**: early exits, flagged sessions, same-day sessions, map or build changes, incomplete participants.
-2. **Manipulation check**: "going somewhere" by condition.
-3. **Primary**: preference as a share with a Wilson 95% CI and an exact sign test; paired Wilcoxon signed-rank on pleasantness, coherence, monotony and effectiveness.
-4. **Secondary, descriptive**: pre→post change and progress towards the target, with t intervals; check-ins; mean mood curves.
-5. **Order check**, **behaviour**, **listener ratings against the provisional map**, and what participants wrote.
-
-On power: with an exact sign test, n = 16 and a true 75% preference for guided gives 40% power, n = 20 gives 62%, and ~30 are needed for 80%. Report the share and its interval.
+It writes `analysis/` next to the logs: `sessions.csv`, `probes.csv`, `curves.csv`, `ratings.csv` (listener ratings of sounds, against the provisional map) and `summary.md`, using only the standard library. Its summary follows the earlier plan in proposal-sections §4.4, where preference was the main outcome; for the study, report the protocol analysis.
 
 ## Testing the pipeline without people
 
 ```bash
 pnpm build && pnpm preview                                   # terminal 1
 BASE_URL=http://localhost:4321/ pnpm study:bot               # terminal 2
-pnpm study:analyse .cache/bot-logs
+pnpm study:protocol .cache/bot-logs
 ```
 
-The bot drives real sessions in headless Chrome with random answers (`PARTICIPANTS`, `MINUTES` (min 0.5), `CONDITIONS`, `OUT`, `SEED`). It uses installed Google Chrome, or `CHROME_PATH=/path/to/chrome`. Four participants × two sessions take about two minutes. The summary marks bot data as such.
+The bot drives real sessions in headless Chrome with random answers (`PARTICIPANTS`, `MINUTES` (min 0.5), `CONDITIONS`, `OUT`, `SEED`), moving to each next session with the thank-you screen's button, as the protocol does. It uses installed Google Chrome, or `CHROME_PATH=/path/to/chrome`. Four participants × two sessions take a few minutes. Both analyses mark bot data as such. With several bots at once, some sounds can miss the load timeout and those participants are excluded, which also exercises the exclusion rules.
 
 `pnpm test` runs the unit tests (~7 s). The one to keep green is *study routes have no abrupt entries*.
 
