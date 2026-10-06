@@ -13,10 +13,10 @@ and writes, to <out> (default: <logs folder>/analysis):
     ratings.csv   one row per sound rating, beside the provisional coordinates
     summary.md    the analysis planned in docs/proposal-sections.md §4.4
 
-The plan it follows: preference and the experiential ratings are primary;
-"felt like it was going somewhere" is a manipulation check; change in
-self-reported affect is secondary and reported descriptively, because a
-pilot this size is not powered to detect it.
+The plan it follows is the earlier one in proposal-sections §4.4, where
+preference was the main outcome. The study protocol's analysis, with change
+in calmness as the primary outcome, is protocol_analysis.py; report that one.
+This summary stays useful for data quality and the descriptive measures.
 
 Standard library only (Python 3.9+), like scripts/libraries/, so teammates
 need nothing installed.
@@ -418,8 +418,8 @@ def summarise(sessions, probes, curves, ratings):
         rows.append([label(c), len(values), fmt(statistics.median(values) if values else None, 1), fmt(statistics.fmean(values) if values else None)])
     say(table(["Condition", "n", "Median", "Mean"], rows) + "\n")
 
-    # -- primary: preference
-    say("## Primary: preference\n")
+    # -- preference
+    say("## Preference\n")
     finals = [r for r in sessions if r["preferred_condition"] is not None]
     counts = defaultdict(int)
     for r in finals:
@@ -436,8 +436,8 @@ def summarise(sessions, probes, curves, ratings):
                     f"exact sign test p = {fmt(binomial_two_sided(k, n), 3)}.")
         say("\nReport the share and its interval; at pilot size the test only detects a strong preference.\n")
 
-    # -- primary: experiential ratings
-    say("## Primary: experiential ratings\n")
+    # -- experiential ratings
+    say("## Experiential ratings\n")
     say("1–7 agreement. Paired comparisons use participants who did both conditions "
         "(Wilcoxon signed-rank, exact below n = 30). Monotony is the check on "
         "variety: a guided win that comes with lower monotony may be about change, not direction.\n")
@@ -458,8 +458,8 @@ def summarise(sessions, probes, curves, ratings):
     if rows:
         say(table(["Comparison", "Item", "Pairs", "Median diff", "W+", "p"], rows) + "\n")
 
-    # -- secondary: affect
-    say("## Secondary: self-reported affect (descriptive)\n")
+    # -- affect
+    say("## Self-reported affect (descriptive)\n")
     say("Change from the pre to the post rating, in grid points (1–9 scale), with 95% "
         "confidence intervals. \"Progress\" is how many cells closer to their target "
         "participants ended than they started. Not powered for between-condition tests.\n")
