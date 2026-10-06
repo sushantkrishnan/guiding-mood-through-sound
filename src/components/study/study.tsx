@@ -8,24 +8,27 @@ import { Probe } from './probe';
 import { Questionnaire } from './questionnaire';
 import { RatingBlock } from './rating-block';
 import { Recorder } from './recorder';
-import { Setup, type ResolvedTarget } from './setup';
+import { rememberSetup, Setup } from './setup';
 
 import { FADE_OUT } from '@/constants/events';
 import { cellDistance, cellToPoint, distance, fitToPool } from '@/lib/affect';
 import { chime } from '@/lib/chime';
 import { dispatch } from '@/lib/event';
-import { saveLog } from '@/lib/log-store';
+import { saveLog, savedLogs } from '@/lib/log-store';
 import {
   centroid,
   createLog,
   downloadLog,
   logFilename,
+  PROBE_TIMEOUT_MS,
   ratingSounds,
+  resolveTarget,
   sincePrevious,
   targetExposure,
   toAnswer,
   type Condition,
   type Questionnaire as Answers,
+  type ResolvedTarget,
   type SessionLog,
   type SoundRating,
   type StudySetup,
@@ -111,6 +114,8 @@ function Session() {
   const openProbe = useRef<number | null>(null);
   const probeCursor = useRef(0);
   const finished = useRef(false);
+  /** performance.now() when the last session's fade-out has fully finished */
+  const fadeEndsAt = useRef(0);
 
   const go = useCallback((next: Phase) => {
     recorder.current?.event('phase', { phase: next });
@@ -166,7 +171,9 @@ function Session() {
 
     setCondition(log.condition);
     setPre(null);
-    setTarget(presetTarget?.cell ?? null);
+    // the participant's own answer only: a fixed target must not show as a
+    // preselected square on "How would you like to feel?"
+    setTarget(null);
     setPreset(presetTarget);
     setPost(null);
     setCurve(emptyCurve());
@@ -179,10 +186,44 @@ function Session() {
     go('welcome');
   };
 
+  /** Move past check-in `i`, answered or not. */
+  const closeProbe = (i: number) => {
+    const r = recorder.current;
+
+    if (!r) return;
+
+    const { probes } = r.log.measures;
+    openProbe.current = null;
+    probeCursor.current = i + 1;
+
+    // a probe that fell due while this one was open is skipped, not stacked
+    let next = probes[probeCursor.current];
+    while (next && next.dueMs <= listenedMs.current) {
+      r.event('probe-skipped', { index: next.index });
+      probeCursor.current++;
+      next = probes[probeCursor.current];
+    }
+
+    setProbeOpen(false);
+  };
+
   const maybeShowProbe = (elapsed: number) => {
     const r = recorder.current;
 
-    if (!r || openProbe.current !== null) return;
+    if (!r) return;
+
+    const open = openProbe.current;
+
+    if (open !== null) {
+      const shown = r.log.measures.probes[open].shownMs ?? elapsed;
+
+      if (elapsed - shown >= PROBE_TIMEOUT_MS) {
+        r.event('probe-missed', { index: open });
+        closeProbe(open);
+      }
+
+      return;
+    }
 
     const i = probeCursor.current;
     const probe = r.log.measures.probes[i];
@@ -209,18 +250,7 @@ function Session() {
     probes[i].answer = toAnswer(cell);
     r.event('probe-answered', { index: i });
 
-    openProbe.current = null;
-    probeCursor.current = i + 1;
-
-    // a probe that fell due while this one was open is skipped, not stacked
-    let next = probes[probeCursor.current];
-    while (next && next.dueMs <= listenedMs.current) {
-      r.event('probe-skipped', { index: next.index });
-      probeCursor.current++;
-      next = probes[probeCursor.current];
-    }
-
-    setProbeOpen(false);
+    closeProbe(i);
   };
 
   const finishListening = (early: boolean) => {
@@ -254,6 +284,7 @@ function Session() {
 
     dispatch(FADE_OUT, { duration: FADE_MS });
     setTimeout(() => useSoundStore.getState().unselectAll(), FADE_MS + 200);
+    fadeEndsAt.current = performance.now() + FADE_MS + 200;
 
     void persist();
     go('post');
@@ -264,6 +295,15 @@ function Session() {
     targetCell: GridCell,
     source: TargetSource,
   ) => {
+    // the previous session's fade-out ends by pausing the player and
+    // clearing every sound, which would stop this session's clock and
+    // abandon its route; only possible when sessions follow within seconds
+    const settle = fadeEndsAt.current - performance.now();
+    if (settle > 0) {
+      go('loading');
+      await new Promise(resolve => setTimeout(resolve, settle + 100));
+    }
+
     const r = recorder.current;
 
     if (!r) return;
@@ -450,6 +490,23 @@ function Session() {
     setPhase('setup');
   };
 
+  /** The participant's next session, as in the protocol: same visit, no setup. */
+  const startNextSession = async () => {
+    const done = recorder.current?.log;
+
+    if (!done || done.session >= done.order.length) return;
+
+    const logs = await savedLogs();
+    const next = { ...done.setup, session: done.session + 1 };
+    const target = resolveTarget(next, logs, done.participantId);
+
+    // `first` mode with no saved first session: the setup screen explains
+    if (target === undefined) return backToSetup();
+
+    rememberSetup(next);
+    handleStart(next, done.order, target, logs);
+  };
+
   const r = recorder.current;
   const l = r?.log;
   const checkIns = (l?.config.probeTimesMs.length ?? 0) > 0;
@@ -486,7 +543,10 @@ function Session() {
           </p>
           <p className={styles.lead}>
             First you will tell us how you feel now
-            {preset ? '' : ', and how you would like to feel'}.
+            {preset?.source === 'first-session'
+              ? ''
+              : ', and how you would like to feel'}
+            .
             {checkIns &&
               ' While you listen, a short question will appear on screen a couple of times.'}{' '}
             There are no right or wrong answers.
@@ -515,13 +575,9 @@ function Session() {
         />
       )}
 
-      {phase === 'target' && pre && preset && (
+      {phase === 'target' && pre && preset?.source === 'first-session' && (
         <GridStep
-          help={
-            preset.source === 'first-session'
-              ? 'In your first session you chose the feeling marked on the grid as your goal. This session aims for the same one. The ring shows how you feel now.'
-              : 'This session aims to help you towards the feeling marked on the grid. The ring shows how you feel now.'
-          }
+          help="In your first session you chose the feeling marked on the grid as your goal. This session aims for the same one. The ring shows how you feel now."
           nextLabel="Start listening"
           reference={pre}
           referenceLabel="how you feel now"
@@ -531,9 +587,15 @@ function Session() {
         />
       )}
 
-      {phase === 'target' && pre && !preset && (
+      {/* with a fixed target the answer is recorded, but the route still
+          heads for the fixed cell, the same for everyone */}
+      {phase === 'target' && pre && preset?.source !== 'first-session' && (
         <GridStep
-          help="Pick the square for the feeling you would like to have by the end of the session. The ring shows how you feel now."
+          help={
+            preset
+              ? 'Pick the square for how you would like to feel. The ring shows how you feel now.'
+              : 'Pick the square for the feeling you would like to have by the end of the session. The ring shows how you feel now.'
+          }
           nextLabel="Start listening"
           reference={pre}
           referenceLabel="how you feel now"
@@ -543,7 +605,8 @@ function Session() {
           onNext={() => {
             if (!l || !target) return;
             l.measures.target = toAnswer(target);
-            startListening(pre, target, 'participant');
+            if (preset) startListening(pre, preset.cell, preset.source);
+            else startListening(pre, target, 'participant');
           }}
         />
       )}
@@ -673,6 +736,11 @@ function Session() {
               </p>
             )}
             <div className={styles.actions}>
+              {l.session < l.order.length && (
+                <button type="button" onClick={startNextSession}>
+                  Start session {l.session + 1} for {l.participantId}
+                </button>
+              )}
               <button type="button" onClick={() => downloadLog(l)}>
                 Download again
               </button>

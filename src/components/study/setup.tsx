@@ -5,14 +5,14 @@ import {
   CONDITIONS,
   DEFAULT_SETUP,
   downloadLog,
-  firstTarget,
   orderFor,
+  resolveTarget,
   sequencesFor,
   sincePrevious,
   type Condition,
+  type ResolvedTarget,
   type SessionLog,
   type StudySetup,
-  type TargetSource,
 } from '@/lib/study';
 import { ENGINE_DEFAULTS } from '@/lib/transition';
 import { getAssetPath } from '@/helpers/path';
@@ -20,14 +20,21 @@ import { useMixStore } from '@/stores/mix';
 import { useSettingsStore } from '@/stores/settings';
 import { useSoundStore } from '@/stores/sound';
 
-import type { GridCell } from '@/lib/affect';
-
 import styles from './study.module.css';
 
 const SETUP_KEY = 'moodist-study-setup';
 
-/** sessions closer together than this get a warning: the protocol wants separate days */
-const SAME_DAY_MS = 12 * 60 * 60 * 1000;
+/** a previous session this recent is shown, so the session number can be checked */
+const RECENT_MS = 12 * 60 * 60 * 1000;
+
+/** Remember a setup, so the setup screen opens on it next time. */
+export function rememberSetup(setup: StudySetup) {
+  try {
+    localStorage.setItem(SETUP_KEY, JSON.stringify(setup));
+  } catch {
+    // not essential
+  }
+}
 
 /** a sound in the middle of the map, for setting the device volume */
 const CALIBRATION_SOUND = 'light-rain';
@@ -35,11 +42,6 @@ const CALIBRATION_MS = 20_000;
 
 const labelOf = (id: Condition) =>
   CONDITIONS.find(c => c.id === id)?.label ?? id;
-
-export interface ResolvedTarget {
-  cell: GridCell;
-  source: Exclude<TargetSource, 'participant'>;
-}
 
 interface SetupProps {
   onStart: (
@@ -92,16 +94,10 @@ export function Setup({ onStart }: SetupProps) {
 
   const id = setup.participantId.trim();
 
-  const target = useMemo<ResolvedTarget | null | undefined>(() => {
-    if (setup.targetMode === 'fixed')
-      return { cell: setup.fixedTarget, source: 'fixed' };
-    if (setup.targetMode === 'choose' || setup.session <= 1) return null;
-
-    const cell = firstTarget(logs, id);
-
-    // undefined: needed but not found
-    return cell ? { cell, source: 'first-session' } : undefined;
-  }, [setup.targetMode, setup.fixedTarget, setup.session, logs, id]);
+  const target = useMemo(
+    () => resolveTarget(setup, logs, id),
+    [setup, logs, id],
+  );
 
   const since = useMemo(
     () => (id ? sincePrevious(logs, id, setup.session) : null),
@@ -171,12 +167,7 @@ export function Setup({ onStart }: SetupProps) {
 
     const final = { ...setup, conditions, participantId: id };
 
-    try {
-      localStorage.setItem(SETUP_KEY, JSON.stringify(final));
-    } catch {
-      // not essential
-    }
-
+    rememberSetup(final);
     onStart(final, order, target, logs);
   };
 
@@ -308,7 +299,11 @@ export function Setup({ onStart }: SetupProps) {
                 'they pick it in session 1; later sessions reuse it',
               ],
               ['choose', 'Participant chooses each session', ''],
-              ['fixed', 'Fixed', 'e.g. to test calming down only'],
+              [
+                'fixed',
+                'Fixed',
+                'the protocol: everyone heads for the same calm cell; they are still asked how they would like to feel',
+              ],
             ] as const
           ).map(([mode, label, hint]) => (
             <label className={styles.check} key={mode}>
@@ -545,11 +540,11 @@ export function Setup({ onStart }: SetupProps) {
           </p>
         )}
 
-        {since !== null && since < SAME_DAY_MS && (
-          <p className={styles.warning}>
+        {since !== null && since < RECENT_MS && (
+          <p className={styles.hint}>
             {id}&apos;s previous session ended{' '}
-            {Math.max(1, Math.round(since / 60_000))} minutes ago. The protocol
-            runs sessions on separate days.
+            {Math.max(1, Math.round(since / 60_000))} minutes ago. Check the
+            session number is the next one.
           </p>
         )}
 
